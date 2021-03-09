@@ -390,57 +390,86 @@ export default function BookingTable(props) {
   {
     columns = [
       // { field: 'id', headerName: '#', width: 70 },
-  
-      {field: '_id', headerName:' ', width: 70, renderCell: (params) =>{
+
+      {
+        field: "_id",
+        headerName: " ",
+        width: 120,
+        renderCell: (params) => {
           return (
+            <React.Fragment>
+              <IconButton
+                color="primary"
+                onClick={(event) => openDetailsDialog(event, params.value)}
+              >
+                <SearchIcon />
+              </IconButton>
 
-           <React.Fragment>
-
-                <Button 
-                        color="primary"
-                        onClick = {event => openDetailsDialog(event, params.value)}
-                > 
-            
-            <SearchIcon/> 
-            
-            </Button>
-
-           </React.Fragment>
-
-          
-  
-          ); 
-      
-        }
+              <span
+                style={{
+                  color: "#058700",
+                  fontWeight: "500",
+                  fontSize: "0.8rem",
+                }}
+              >
+                {params.getValue("questions") && "Self-Test"}
+              </span>
+            </React.Fragment>
+          );
+        },
       },
 
-
-
-      { field: 'timeStamp', headerName: 'TimeStamp', width: 200, valueFormatter: (params) => { 
-        return formatTimeStamp(params.value);
-        }
+      {
+        field: "timeStamp",
+        headerName: "TimeStamp",
+        width: 200,
+        valueFormatter: (params) => {
+          return formatTimeStamp(params.value);
+        },
       },
-  
-      { field: 'bookingDate', headerName: 'B Date', width: 110, valueFormatter: (params) => { 
-              return FormatDateFromString(params.value);
-          }
-       },
-      { field: 'bookingTimeNormalized', headerName: 'B Time', width: 200 , valueGetter: (params) => {
-        return params.getValue('bookingTime');
-      }},
-      { field: 'fullname', headerName: 'Fullname', width: 250 },
-      { field: 'email', headerName: 'Email', width: 200 },
-      { field: 'phone', headerName: 'Telephone', width: 150 },
-      { field: 'faceToFaceConsultation', headerName: 'Consultation', width: 250 , renderCell: (params) => {
-        return (
-          <React.Fragment>
-              {params.getValue('faceToFaceConsultation') && <span> Face to Face </span>}
-              {params.getValue('faceToFaceConsultation') && <span style={{paddingLeft:"5px", paddingRight:"5px"}}> - </span>}
-              {params.getValue('telephoneConsultation') && <span> Telephone </span>}
-          </React.Fragment>
-        )
-      }},
-    
+
+      {
+        field: "bookingDate",
+        headerName: "B Date",
+        width: 110,
+        valueFormatter: (params) => {
+          return FormatDateFromString(params.value);
+        },
+      },
+      {
+        field: "bookingTimeNormalized",
+        headerName: "B Time",
+        width: 200,
+        valueGetter: (params) => {
+          return params.getValue("bookingTime");
+        },
+      },
+      { field: "fullname", headerName: "Fullname", width: 250 },
+      { field: "email", headerName: "Email", width: 200 },
+      { field: "phone", headerName: "Telephone", width: 150 },
+      {
+        field: "faceToFaceConsultation",
+        headerName: "Consultation",
+        width: 250,
+        renderCell: (params) => {
+          return (
+            <React.Fragment>
+              {params.getValue("faceToFaceConsultation") && (
+                <span> Face to Face </span>
+              )}
+              {params.getValue("faceToFaceConsultation") && (
+                <span style={{ paddingLeft: "5px", paddingRight: "5px" }}>
+                  {" "}
+                  -{" "}
+                </span>
+              )}
+              {params.getValue("telephoneConsultation") && (
+                <span> Telephone </span>
+              )}
+            </React.Fragment>
+          );
+        },
+      },
     ];
 
   }
@@ -449,28 +478,34 @@ export default function BookingTable(props) {
     columns = [
       // { field: 'id', headerName: '#', width: 70 },
   
-      {field: '_id', headerName:' ', width: 70, renderCell: (params) =>{
+      {
+        field: "_id",
+        headerName: " ",
+        width: 120,
+        renderCell: (params) => {
           return (
+            <React.Fragment>
+              <IconButton
+                color="primary"
+                onClick={(event) => openDetailsDialog(event, params.value)}
+              >
+                <SearchIcon />
+              </IconButton>
 
-           <React.Fragment>
-
-                <Button 
-                        color="primary"
-                        onClick = {event => openDetailsDialog(event, params.value)}
-                > 
-            
-            <SearchIcon/> 
-            
-            </Button>
-
-           </React.Fragment>
-
-          
-  
-          ); 
-      
-        }
+              <span
+                style={{
+                  color: "#058700",
+                  fontWeight: "500",
+                  fontSize: "0.8rem",
+                }}
+              >
+                {params.getValue("questions") && "Self-Test"}
+              </span>
+            </React.Fragment>
+          );
+        },
       },
+
 
 
 

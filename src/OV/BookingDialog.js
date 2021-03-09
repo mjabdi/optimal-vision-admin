@@ -358,6 +358,22 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
     color: "#fff",
   },
+
+  question:{
+    fontSize:"1.3rem",
+    fontWeight: "400",
+    color: theme.palette.secondary.main,
+    marginTop:"30px"
+  },
+
+  answer:{
+    fontSize:"1.3rem",
+    fontWeight: "500",
+    color: theme.palette.primary.main,
+  },
+
+
+
 }));
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -838,6 +854,22 @@ export default function BookingDialog(props) {
     props.onClose();
   };
 
+  const [openQDialg, setOpenQDialog] = React.useState(false)
+  const handleQDialgClose = () =>
+  {
+    setOpenQDialog(false)
+  }
+
+  const fixQuestion = (str) =>
+  {
+    let result = str.replace('*', '')
+    if (!result.trim().endsWith('?'))
+    {
+      result += '?'
+    }
+    return result
+  }
+
   return (
     <React.Fragment>
       {booking && (
@@ -855,7 +887,15 @@ export default function BookingDialog(props) {
             <DialogTitle
               id="alert-dialog-slide-title"
               className={classes.dialogTitle}
+              style={{position:"relative"}}
             >
+              {booking.questions && (
+                 <div style={{position:"absolute", right:"10px", top:"12px", backgroundColor:"#069c00", fontSize:"0.85rem", padding:"8px", borderRadius:"10px"}}>
+                   Self-Test
+                 </div>
+              )}
+
+
               <Grid
                 container
                 direction="row"
@@ -1152,6 +1192,20 @@ export default function BookingDialog(props) {
                       </li>
 
                       <Divider />
+
+                      {booking.questions && (
+                        <React.Fragment>
+                          <div style={{display:"flex", justifyContent:"center"}}>
+                          <Button fullWidth variant="contained" color="primary" style={{color:"#fff",margin:"10px"}} onClick={() => setOpenQDialog(true)}>
+                             Show questionnaire
+                          </Button>
+                          </div>
+                          <Divider />
+                        </React.Fragment>
+                      )}
+
+                   
+
                       
                       <div style={{marginTop:"20px"}}>
 
@@ -1374,6 +1428,33 @@ export default function BookingDialog(props) {
               </Backdrop>
             </DialogContent>
           </Dialog>
+
+          <Dialog
+            open={openQDialg}
+            onClose={handleQDialgClose}
+            maxWidth="sm"
+          >
+            <DialogContent>
+                      {booking.questions && JSON.parse(booking.questions).map(item => (
+                        <div >
+                          <div className={classes.question}>
+                            {fixQuestion(item.question)}
+                          </div>
+                          <div className={classes.answer}>
+                            {item.answer}
+                          </div>
+                        </div>
+                      ))}
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={() => setOpenQDialog(false)}>
+                Close
+              </Button>
+            </DialogActions>
+
+          </Dialog>
+
         </React.Fragment>
       )}
     </React.Fragment>

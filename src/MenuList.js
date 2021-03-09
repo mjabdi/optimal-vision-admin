@@ -51,7 +51,7 @@ import OVBookingTable from "./OV/BookingTable";
 
 export const MenuList_OV_Admin = [
   {
-    index: 1,
+    index: 0,
     id: `recentBookings`,
     title: `Recent Bookings`,
     icon: <AutorenewIcon />,
@@ -368,7 +368,7 @@ export const MenuList_PCR = [
 export const getMenuContent = (role, index) => {
    if (role === "ovadmin") {
     switch (index) {
-      case 1:
+      case 0:
         return <OVBookingTable date="recent" />;
       case 2:
         return <OVBookingTable date="today" />;
