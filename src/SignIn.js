@@ -96,7 +96,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   pageBg:{
-    paddingTop: theme.spacing(15),
+    paddingTop: theme.spacing(5),
    
     background: "linear-gradient(274deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 5%, rgba(210,210,210,1) 100%)",
     height: "100vh",

@@ -46,6 +46,7 @@ import STDCalendarView from "./STD/calendar-admin/CalendarView";
 
 // OV Admin ----------------
 import OVBookingTable from "./OV/BookingTable";
+import OVCalendarView from "./OV/calendar-admin/CalendarView";
 
 //---------------
 
@@ -86,6 +87,13 @@ export const MenuList_OV_Admin = [
     title: `Archived Records`,
     icon: <DeleteIcon />,
   },
+  {
+    index: 7,
+    id: `calendarView`,
+    title: `Calendar View`,
+    icon: <DateRangeIcon />,
+  },
+
 
 ];
 
@@ -380,6 +388,8 @@ export const getMenuContent = (role, index) => {
         return <OVBookingTable date="all" />;
       case 6:
         return <OVBookingTable date="deleted" />;
+        case 7:
+          return <OVCalendarView />;  
       default:
         return `Page Not Found!`;
     }

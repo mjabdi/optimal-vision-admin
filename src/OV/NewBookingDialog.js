@@ -47,7 +47,7 @@ import NumberFormat from "react-number-format";
 import AddIcon from "@material-ui/icons/Add";
 import { validate } from "email-validator";
 import DateRangeIcon from "@material-ui/icons/DateRange";
-import { CalendarColors } from "../Admin/calendar-admin/colors";
+import { CalendarColors } from "./calendar-admin/colors";
 
 var interval;
 
@@ -185,7 +185,8 @@ const useStyles = makeStyles((theme) => ({
   },
 
   DateTimeLabel: {
-    fontWeight: "500",
+    fontWeight: "600",
+    fontSize: "1.2rem",
     color: theme.palette.primary.main,
   },
 
@@ -203,6 +204,159 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.secondary.main,
     fontWeight: "600"
   },
+
+  BoxDisabled: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    borderColor: "#ddd",
+    cursor: "not-allowed",
+    color: "#ddd",
+    transition: "all 0.2s ease",
+  },
+
+  BoxVC: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.VC_COLOR,
+    color: CalendarColors.VC_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.VC_COLOR,
+      color: "#fff"
+    }
+  
+  },
+
+  BoxF2F: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.F2F_COLOR,
+    color: CalendarColors.F2F_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.F2F_COLOR,
+      color: "#fff"
+    }
+  
+  },
+
+  BoxLaser: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.LASER_COLOR,
+    color: CalendarColors.LASER_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.LASER_COLOR,
+      color: "#fff"
+    }
+  
+  },
+
+  BoxCataract: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.CATARACT_COLOR,
+    color: CalendarColors.CATARACT_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.CATARACT_COLOR,
+      color: "#fff"
+    }
+  
+  },
+
+
+
+
+
+
+
+
+  BoxGynae: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.GYNAE_COLOR,
+    color: CalendarColors.GYNAE_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.GYNAE_COLOR,
+      color: "#fff"
+    }
+  
+  },
+
+  BoxGP: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.GP_COLOR,
+    color: CalendarColors.GP_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.GP_COLOR,
+      color: "#fff"
+    }
+  },
+
+  BoxSTD: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.STD_COLOR,
+    color: CalendarColors.STD_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.STD_COLOR,
+      color: "#fff"
+    }
+  },
+
 
 
 }));
@@ -300,85 +454,21 @@ export default function NewBookingDialog(props) {
   const classes = useStyles();
 
   const [state, setState] = React.useContext(GlobalState);
-  const [saving, setSaving] = useState(false);
 
-  const [fullname, setFullname] = React.useState("");
-  const [fullnameError, setFullnameError] = React.useState(false);
-
-  const [phone, setPhone] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [notes, setNotes] = React.useState("");
-
-  
-  const fullnameChanged = (event) => {
-    setFullname(event.target.value);
-    setFullnameError(false);
-  };
-
-  const phoneChanged = (event) => {
-    setPhone(event.target.value);
-  };
-
-  const emailChanged = (event) => {
-    setEmail(event.target.value);
-  };
-
-
-  const notesChanged = (event) => {
-    setNotes(event.target.value);
-  };
-
-  const handleClose = () => {
-    if (saving) return;
-
-    setFullname("");
-    setFullnameError(false);
-    setPhone("");
-    setEmail("");
-    setNotes("");
-    
+  const handleClose = () => {    
     props.handleClose();
-    setSaving(false);
   };
 
-  const validateBooking = () => {
-    let error = false;
-    if (!fullname || fullname.trim().length < 1) {
-      setFullnameError(true);
-      error = true;
-    }
-    return !error;
-  };
 
-  const saveClicked = async () => {
-    if (!validateBooking()) {
-      return;
-    }
+  const timeDisabled = () =>
+  {
+    return props.time.indexOf(':15') > 0 || props.time.indexOf(':45') > 0 || props.time.indexOf('09') >= 0 
+  }
 
-    setSaving(true);
-
-    try {
-      await BookService.addNewBooking({
-        bookingDate: props.date,
-        bookingTime: props.time,
-        fullname: fullname,
-        phone: phone,
-        email: email,
-        notes: notes,
-      });
-      setSaving(false);
-      setState((state) => ({
-        ...state,
-        bookingDialogDataChanged: !state.bookingDialogDataChanged
-          ? true
-          : false,
-      }));
-      handleClose();
-    } catch (err) {
-      console.error(err);
-      setSaving(false);
-    }
-  };
+  const clinicClicked = (clinic) =>
+  {
+    props.clinicClicked(clinic)
+  }
 
   return (
     <React.Fragment>
@@ -417,17 +507,12 @@ export default function NewBookingDialog(props) {
                 </Grid>
               </Grid>
 
-              <div style={{position:"absolute", top: "5px", right: "5px", backgroundColor:CalendarColors.GP_COLOR, color:"#fff", padding: "0px 5px", borderRadius:"10px", fontSize:"1rem"}}>
-                    GP
-              </div>
-
-
               <Divider />
             </DialogTitle>
             <DialogContent>
               <div
                 style={{
-                  height: "400px",
+                  height: "380px",
                 }}
               >
                 <Grid
@@ -456,56 +541,26 @@ export default function NewBookingDialog(props) {
                     </Grid>
                   </Grid>
 
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      autoFocus
-                      error={fullnameError}
-                      label="Full Name"
-                      value={fullname}
-                      required
-                      onChange={fullnameChanged}
-                      name="fullname"
-                      id="fullname-id"
-                      autoComplete="none"
-                    />
+
+                  <Grid item xs={12} style={{marginTop:"20px"}}>
+                    <div className={classes.BoxVC} onClick={() => clinicClicked("Virtual Consultation")}>
+                      Virtual Consultation
+                    </div>
                   </Grid>
-
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Telephone"
-                      value={phone}
-                      onChange={phoneChanged}
-                      name="phone"
-                      id="phone-id"
-                      autoComplete="none"
-                    />
+                    <div className={classes.BoxF2F} onClick={() => clinicClicked("F2F Clinic")}>
+                      F2F Clinic
+                    </div>
                   </Grid>
-
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      value={email}
-                      onChange={emailChanged}
-                      name="email"
-                      id="email-id"
-                      autoComplete="none"
-                    />
+                    <div className={classes.BoxLaser} onClick={() => clinicClicked("Laser Theatre")}>
+                      Laser Theatre
+                    </div>
                   </Grid>
-
-
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Notes"
-                      value={notes}
-                      onChange={notesChanged}
-                      name="notes"
-                      id="notes-id"
-                      autoComplete="none"
-                    />
+                    <div className={classes.BoxCataract} onClick={() => clinicClicked("Cataract Theatre")}>
+                      Cataract Theatre
+                    </div>
                   </Grid>
 
                 </Grid>
@@ -513,8 +568,8 @@ export default function NewBookingDialog(props) {
                 <div
                   style={{
                     position: "absolute",
-                    bottom: "20px",
-                    right: "20px",
+                    bottom: "10px",
+                    right: "10px",
                   }}
                 >
                   <Grid
@@ -528,29 +583,15 @@ export default function NewBookingDialog(props) {
                       <Button
                         onClick={handleClose}
                         style={{ width: "100px" }}
-                        disabled={saving}
                       >
-                        back
+                        close
                       </Button>
                     </Grid>
-                    <Grid item>
-                      <Button
-                        onClick={saveClicked}
-                        variant="contained"
-                        color="secondary"
-                        style={{ width: "100px" }}
-                        disabled={saving}
-                      >
-                        Save
-                      </Button>
-                    </Grid>
+                   
                   </Grid>
                 </div>
               </div>
 
-              <Backdrop className={classes.backdrop} open={saving}>
-                <CircularProgress color="inherit" />
-              </Backdrop>
             </DialogContent>
           </Dialog>
         </React.Fragment>

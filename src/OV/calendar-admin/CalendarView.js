@@ -13,8 +13,14 @@ import DayView from './DayView';
 import GlobalState from '../../GlobalState';
 
 import CloseIcon from '@material-ui/icons/Close';
+import { CalendarColors } from './colors';
 
-
+const Clinics = [
+    {clinic: "Virtual Consultation", color: CalendarColors.VC_COLOR},
+    {clinic: "F2F Clinic", color: CalendarColors.F2F_COLOR},
+    {clinic: "Laser Theatre", color: CalendarColors.LASER_COLOR},
+    {clinic: "Cataract Theatre", color: CalendarColors.CATARACT_COLOR},
+]
 
 const monthNames = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
@@ -67,6 +73,7 @@ export default function CalendarView() {
         const firstdayofweek = new Date(today.getTime() - ( dayofWeek * 86400000));
         setFirstDayofWeek(firstdayofweek);
         setState(state => ({...state, AdminCalendarCache : []}));
+        setState(state => ({...state, selectedClinics : Clinics.map(item => item.clinic) }));
 
         return () =>
         {
@@ -264,8 +271,42 @@ export default function CalendarView() {
         return `Next ${mode}`;
     }
 
+    const clinicClicked = (clinic) =>
+    {
+        if (state.selectedClinics?.findIndex(e => e === clinic) >= 0 )
+        {
+            setState(state => ({...state, selectedClinics :state.selectedClinics.filter(e => e !== clinic)}));
+        }else
+        {
+            setState(state => ({...state, selectedClinics : [...state.selectedClinics, clinic]}));
+        }
+    }
+
+    const getClinicGuide = () =>
+    {
+        return (
+            <div style={{marginBottom:"10px"}}>
+               <Grid container spacing={1}>
+                   {Clinics.map( item => (
+                       <Grid item>
+                           <div 
+                                style={state.selectedClinics?.findIndex(e => e === item.clinic) >= 0 ? {border:`1px solid ${item.color}`, backgroundColor:`${item.color}`, color:"#fff" ,fontSize:"0.95rem", fontWeight:"500", padding:"5px", width:"200px" , textAlign:"center", cursor:"pointer", borderRadius:"4px"}   : {border:`1px solid ${item.color}`, color:`${item.color}`, fontSize:"0.95rem", fontWeight:"500", padding:"5px", width:"200px", textAlign:"center", cursor:"pointer", borderRadius:"4px"}}
+                                onClick= {() => clinicClicked(item.clinic)}   
+                                > 
+                               {item.clinic}
+                           </div>
+                        </Grid>
+                   ))
+                   }
+               </Grid>
+            </div>
+        )
+    }
+
     return (
         <React.Fragment>
+
+            {getClinicGuide()}
 
           <Grid
             container

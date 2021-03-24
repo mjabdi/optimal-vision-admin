@@ -6,7 +6,7 @@ export default class BookService {
 
    static addNewBooking = (payload) =>
    {
-      return API.post(`/api/optimalvision/book/addnewbooking`, payload);
+      return API.post(`/api/optimalvision/book/bookappointment`, payload);
    }
 
 

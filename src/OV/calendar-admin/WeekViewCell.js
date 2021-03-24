@@ -9,10 +9,20 @@ import GlobalState from '../../GlobalState';
 
 import axios from 'axios'
 
+import { Grid } from '@material-ui/core';
+import { CalendarColors } from './colors';
+
+const MAX_BOOKING_COUNT_PCR = 10;
+const MAX_BOOKING_COUNT_GP = 1;
+const MAX_BOOKING_COUNT_STD = 1;
+const MAX_BOOKING_COUNT_GYNAE = 1;
+const MAX_BOOKING_COUNT_BLOOD = 1;
+
 const useStyles = makeStyles((theme) => ({
 
     Container: {
         width: "100%",
+        minHeight: "100px",
         paddingTop: "40%",
         position: "relative",
         backgroundColor: "#fff",
@@ -87,6 +97,55 @@ const useStyles = makeStyles((theme) => ({
         height: "8%"
     },
 
+    PCRGauge: {
+        position: "absolute",
+        bottom: "15px",
+        left: "0",
+        width: "20px",
+        height: "90%",
+      },
+    
+      GynaeGauge: {
+        position: "absolute",
+        bottom: "15px",
+        left: "21px",
+        width: "20px",
+        height: "90%",
+      },
+    
+      GPGauge: {
+        position: "absolute",
+        bottom: "15px",
+        left: "42px",
+        width: "20px",
+        height: "90%",
+      },
+    
+      STDGauge: {
+        position: "absolute",
+        bottom: "15px",
+        left: "63px",
+        width: "20px",
+        height: "90%",
+      },
+      BloodGauge: {
+        position: "absolute",
+        bottom: "15px",
+        left: "84px",
+        width: "20px",
+        height: "90%",
+      },
+
+    
+
+    DayLabelContainer:{
+        position: "absolute",
+        top: "15%",
+        left:"5px",
+        width:"100%",
+        height:"100%"   
+    },
+
   }));
 
 const MAX_BOOKING_COUNT = 1;  
@@ -95,7 +154,7 @@ const WeekViewCell = ({key, date, time, dayClicked}) => {
     const classes = useStyles();
 
     const [state, setState] = React.useContext(GlobalState);
-    const [bookingsCount, setBookingsCount] = React.useState(-1);
+    const [bookingsCount, setBookingsCount] = React.useState(null);
     const [isPast, setIsPast] = React.useState(false);
 
     const [cellDate, setCellDate] = React.useState(new Date());
@@ -123,14 +182,14 @@ const WeekViewCell = ({key, date, time, dayClicked}) => {
         //     return;
         // }
 
-        setBookingsCount(-1);
+        setBookingsCount(null);
 
        
 
         var res = state.AdminCalendarCache?.find(record => record.method === 'getBookingsCountByDateStrandTime' && record.query === `${date}${time}`)?.res;
         if (res)
         {
-            if (res.data.count >= 0)
+            if (res.data.count)
             {
                 setBookingsCount(res.data.count);
             }  
@@ -139,7 +198,7 @@ const WeekViewCell = ({key, date, time, dayClicked}) => {
 
         let source = axios.CancelToken.source();
         BookService.getAllBookingsCountByDateStrandTime(date, time, source).then( res => {
-            if (res.data.count >= 0)
+            if (res.data.count)
             {
                 setBookingsCount(res.data.count);
                 setState(state => ({...state, AdminCalendarCache : [...state.AdminCalendarCache, {method: 'getBookingsCountByDateStrandTime' , query : `${date}${time}`, res: res}]}));
@@ -157,37 +216,319 @@ const WeekViewCell = ({key, date, time, dayClicked}) => {
     }, [date, time]);
 
 
-    const getBookingsCountLabel = (_bookingsCount) =>
-    {
-        if (_bookingsCount === -1)
-        {
-            return (
-                <div className={classes.LoadingProgress}>
-                      <CircularProgress disableShrink  />
-                </div>
-            );  
-        }
-        else if (_bookingsCount > 0)
-        {
-            if (_bookingsCount >= MAX_BOOKING_COUNT)
-            {
-                return (
-                    <div onClick={(event => dayClicked(event,cellDate))} className={classes.BookingCountLabelBusy}>
-                          {_bookingsCount < 10 ? ` ${_bookingsCount}` : `${_bookingsCount}` }
-                    </div>
-                );
-            }
-            else
-            {
-                return (
-                    <div onClick={(event => dayClicked(event,cellDate))} className={classes.BookingCountLabel}>
-                        {_bookingsCount < 10 ? ` ${_bookingsCount}` : `${_bookingsCount}` }
-                    </div>
-                );
-            }
-        }
-    }
+    const minHeight = 1;
+    const getPCRClinicBar = (count) => {
+      let width = (count / MAX_BOOKING_COUNT_PCR) * 100 + 5;
+      if (width > 100) width = 100;
+  
+      if (width < 30) width = 30;
+  
+      if (count === 0) {
+        width = minHeight;
+      }
+  
+      const percent = 100 - width;
+  
+      return (
+        <div className={classes.PCRGauge}>
+          <div
+            style={{
+              padding: "0",
+              margin: "0",
+              width: "100%",
+              height: "100%",
+              backgroundColor: CalendarColors.PCR_COLOR,
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                bottom: "0px",
+                color: "#fff",
+                fontWeight: "500",
+                fontSize:"0.8rem",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              {count > 0 && count}
+            </div>
+  
+            <div
+              style={{
+                padding: "0",
+                margin: "0",
+                width: "100%",
+                height: `${percent}%`,
+                backgroundColor: "#fafafa",
+              }}
+            ></div>
+          </div>
+        </div>
+      );
+    };
+  
+    const getGynaeClinicBar = (count) => {
+      let width = (count / MAX_BOOKING_COUNT_GYNAE) * 100 + 5;
+      if (width > 100) width = 100;
+  
+      if (width < 30) width = 30;
+  
+      if (count === 0) {
+        width = minHeight;
+      }
+  
+      const percent = 100 - width;
+  
+      return (
+        <div className={classes.GynaeGauge}>
+          <div
+            style={{
+              padding: "0",
+              margin: "0",
+              width: "100%",
+              height: "100%",
+              backgroundColor: CalendarColors.GYNAE_COLOR,
+              position: "relative",
+            }}
+          >
+            <div
+               style={{
+                  position: "absolute",
+                  bottom: "0px",
+                  color: "#fff",
+                  fontWeight: "500",
+                  fontSize:"0.8rem",
+                  textAlign: "center",
+                  width: "100%",
+                }}
+            >
+              {count > 0 && count}
+            </div>
+  
+            <div
+              style={{
+                padding: "0",
+                margin: "0",
+                width: "100%",
+                height: `${percent}%`,
+                backgroundColor: "#fafafa",
+              }}
+            ></div>
+          </div>
+        </div>
+      );
+    };
+  
+    const getGPClinicBar = (count) => {
+      let width = (count / MAX_BOOKING_COUNT_GP) * 100 + 5;
+      if (width > 100) width = 100;
+  
+      if (width < 30) width = 30;
+  
+      if (count === 0) {
+        width = minHeight;
+      }
+  
+      const percent = 100 - width;
+  
+      return (
+        <div className={classes.GPGauge}>
+          <div
+            style={{
+              padding: "0",
+              margin: "0",
+              width: "100%",
+              height: "100%",
+              backgroundColor: CalendarColors.GP_COLOR,
+              position: "relative",
+            }}
+          >
+            <div
+               style={{
+                  position: "absolute",
+                  bottom: "0px",
+                  color: "#fff",
+                  fontWeight: "500",
+                  fontSize:"0.8rem",
+                  textAlign: "center",
+                  width: "100%",
+                }}
+            >
+              {count > 0 && count}
+            </div>
+  
+            <div
+              style={{
+                padding: "0",
+                margin: "0",
+                width: "100%",
+                height: `${percent}%`,
+                backgroundColor: "#fafafa",
+              }}
+            ></div>
+          </div>
+        </div>
+      );
+    };
+  
+    const getSTDClinicBar = (count) => {
+      let width = (count / MAX_BOOKING_COUNT_STD) * 100 + 5;
+      if (width > 100) width = 100;
+  
+      if (width < 30) width = 30;
+  
+      if (count === 0) {
+        width = minHeight;
+      }
+  
+      const percent = 100 - width;
+  
+      return (
+        <div className={classes.STDGauge}>
+          <div
+            style={{
+              padding: "0",
+              margin: "0",
+              width: "100%",
+              height: "100%",
+              backgroundColor: CalendarColors.STD_COLOR,
+              position: "relative",
+            }}
+          >
+            <div
+               style={{
+                  position: "absolute",
+                  bottom: "0px",
+                  color: "#fff",
+                  fontWeight: "500",
+                  fontSize:"0.8rem",
+                  textAlign: "center",
+                  width: "100%",
+                }}
+            >
+              {count > 0 && count}
+            </div>
+  
+            <div
+              style={{
+                padding: "0",
+                margin: "0",
+                width: "100%",
+                height: `${percent}%`,
+                backgroundColor: "#fafafa",
+              }}
+            ></div>
+          </div>
+        </div>
+      );
+    };
 
+    const getBloodClinicBar = (count) => {
+      let width = (count / MAX_BOOKING_COUNT_BLOOD) * 100 + 5;
+      if (width > 100) width = 100;
+  
+      if (width < 30) width = 30;
+  
+      if (count === 0) {
+        width = minHeight;
+      }
+  
+      const percent = 100 - width;
+  
+      return (
+        <div className={classes.BloodGauge}>
+          <div
+            style={{
+              padding: "0",
+              margin: "0",
+              width: "100%",
+              height: "100%",
+              backgroundColor: CalendarColors.BLOOD_COLOR,
+              position: "relative",
+            }}
+          >
+            <div
+               style={{
+                  position: "absolute",
+                  bottom: "0px",
+                  color: "#fff",
+                  fontWeight: "500",
+                  fontSize:"0.8rem",
+                  textAlign: "center",
+                  width: "100%",
+                }}
+            >
+              {count > 0 && count}
+            </div>
+  
+            <div
+              style={{
+                padding: "0",
+                margin: "0",
+                width: "100%",
+                height: `${percent}%`,
+                backgroundColor: "#fafafa",
+              }}
+            ></div>
+          </div>
+        </div>
+      );
+    };
+
+  
+  
+    const getBookingsCountLabel = (_bookingsCount) => {
+      if (!_bookingsCount) {
+        return (
+          <div className={classes.LoadingProgress}>
+            <CircularProgress disableShrink />
+          </div>
+        );
+      } else if (_bookingsCount !== -2) {
+        return (
+          <div className={classes.DayLabelContainer}>
+            <Grid
+              container
+              direction="row"
+              justify="flex-start"
+              alignItems="flex-end"
+              style={{ width: "100%", height: "100%" }}
+            >
+              {_bookingsCount.map((item) => (
+                <Grid item>{getClinicBar(item.clinic, item.count)}</Grid>
+              ))}
+            </Grid>
+          </div>
+        );
+      }
+    };
+
+    const getClinicBar = (clinic, count) => {
+        return (
+          <React.Fragment>
+            {clinic === "pcr" &&
+              state.selectedClinics.findIndex((e) => e === "PCR") >= 0 &&
+              getPCRClinicBar(count)}
+            {clinic === "gynae" &&
+              state.selectedClinics.findIndex((e) => e === "GYNAE") >= 0 &&
+              getGynaeClinicBar(count)}
+            {clinic === "gp" &&
+              state.selectedClinics.findIndex((e) => e === "GP") >= 0 &&
+              getGPClinicBar(count)}
+            {clinic === "std" &&
+              state.selectedClinics.findIndex((e) => e === "STD") >= 0 &&
+              getSTDClinicBar(count)}
+                          {clinic === "blood" &&
+              state.selectedClinics.findIndex((e) => e === "BLOOD") >= 0 &&
+              getBloodClinicBar(count)}
+
+          </React.Fragment>
+        );
+      };
+  
+  
     const getBookingsCountGauge = (_bookingsCount) =>
     {
         if (_bookingsCount > 0 )
@@ -213,6 +554,9 @@ const WeekViewCell = ({key, date, time, dayClicked}) => {
         }
     }
 
+
+
+
     return (
         <React.Fragment>
 
@@ -220,7 +564,7 @@ const WeekViewCell = ({key, date, time, dayClicked}) => {
 
               {getBookingsCountLabel(bookingsCount)}
 
-              {getBookingsCountGauge(bookingsCount)}
+              {/* {getBookingsCountGauge(bookingsCount)} */}
 
             </div>
 
