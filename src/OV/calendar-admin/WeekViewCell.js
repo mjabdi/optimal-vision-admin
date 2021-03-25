@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
 
     ContainerPast: {
         width: "100%",
+        minHeight: "100px",
         paddingTop: "40%",
         position: "relative",
         backgroundColor: "#fafafa",
@@ -101,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
 
     PCRGauge: {
         position: "absolute",
-        bottom: "-10px",
+        bottom: "15px",
         left: "0",
         width: "20px",
         height: "90%",
@@ -109,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
     
       GynaeGauge: {
         position: "absolute",
-        bottom: "-10px",
+        bottom: "15px",
         left: "21px",
         width: "20px",
         height: "90%",
@@ -117,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
     
       GPGauge: {
         position: "absolute",
-        bottom: "-10px",
+        bottom: "15px",
         left: "42px",
         width: "20px",
         height: "90%",
@@ -125,7 +126,7 @@ const useStyles = makeStyles((theme) => ({
     
       STDGauge: {
         position: "absolute",
-        bottom: "-10px",
+        bottom: "15px",
         left: "63px",
         width: "20px",
         height: "90%",
