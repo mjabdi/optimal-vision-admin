@@ -157,6 +157,9 @@ const MAX_BOOKING_COUNT_STD = 10;
 const MAX_BOOKING_COUNT_GYNAE = 10;
 const MAX_BOOKING_COUNT_BLOOD = 10;
 
+const MAX_BOOKING_COUNT = 10;
+
+
 
 const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
   const classes = useStyles();
@@ -275,29 +278,25 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
   const getClinicBar = (clinic, count) => {
     return (
       <React.Fragment>
-        {clinic === "pcr" &&
-          state.selectedClinics.findIndex((e) => e === "PCR") >= 0 &&
-          getPCRClinicBar(count)}
-        {clinic === "gynae" &&
-          state.selectedClinics.findIndex((e) => e === "GYNAE") >= 0 &&
-          getGynaeClinicBar(count)}
-        {clinic === "gp" &&
-          state.selectedClinics.findIndex((e) => e === "GP") >= 0 &&
-          getGPClinicBar(count)}
-        {clinic === "std" &&
-          state.selectedClinics.findIndex((e) => e === "STD") >= 0 &&
-          getSTDClinicBar(count)}
-                  {clinic === "blood" &&
-          state.selectedClinics.findIndex((e) => e === "BLOOD") >= 0 &&
-          getBloodClinicBar(count)}
-
+        {clinic === "Virtual Consultation" &&
+          state.selectedClinics.findIndex((e) => e === "Virtual Consultation") >= 0 &&
+          getVCClinicBar(count)}
+        {clinic === "F2F Clinic" &&
+          state.selectedClinics.findIndex((e) => e === "F2F Clinic") >= 0 &&
+          getF2FClinicBar(count)}
+        {clinic === "Laser Theatre" &&
+          state.selectedClinics.findIndex((e) => e === "Laser Theatre") >= 0 &&
+          getLaserClinicBar(count)}
+        {clinic === "Cataract Theatre" &&
+          state.selectedClinics.findIndex((e) => e === "Cataract Theatre") >= 0 &&
+          getCataractClinicBar(count)}
       </React.Fragment>
     );
   };
 
   const minHeight = 1;
-  const getPCRClinicBar = (count) => {
-    let width = (count / MAX_BOOKING_COUNT_PCR) * 100 + 5;
+  const getVCClinicBar = (count) => {
+    let width = (count / MAX_BOOKING_COUNT) * 100 + 5;
     if (width > 100) width = 100;
 
     if (width < 20) width = 20;
@@ -316,7 +315,7 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
             margin: "0",
             width: "100%",
             height: "100%",
-            backgroundColor: CalendarColors.PCR_COLOR,
+            backgroundColor: CalendarColors.VC_COLOR,
             position: "relative",
           }}
         >
@@ -348,8 +347,8 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
     );
   };
 
-  const getGynaeClinicBar = (count) => {
-    let width = (count / MAX_BOOKING_COUNT_GYNAE) * 100 + 5;
+  const getF2FClinicBar = (count) => {
+    let width = (count / MAX_BOOKING_COUNT) * 100 + 5;
     if (width > 100) width = 100;
 
     if (width < 20) width = 20;
@@ -368,7 +367,7 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
             margin: "0",
             width: "100%",
             height: "100%",
-            backgroundColor: CalendarColors.GYNAE_COLOR,
+            backgroundColor: CalendarColors.F2F_COLOR,
             position: "relative",
           }}
         >
@@ -400,8 +399,8 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
     );
   };
 
-  const getGPClinicBar = (count) => {
-    let width = (count / MAX_BOOKING_COUNT_GP) * 100 + 5;
+  const getLaserClinicBar = (count) => {
+    let width = (count / MAX_BOOKING_COUNT) * 100 + 5;
     if (width > 100) width = 100;
 
     if (width < 20) width = 20;
@@ -420,7 +419,7 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
             margin: "0",
             width: "100%",
             height: "100%",
-            backgroundColor: CalendarColors.GP_COLOR,
+            backgroundColor: CalendarColors.LASER_COLOR,
             position: "relative",
           }}
         >
@@ -452,8 +451,8 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
     );
   };
 
-  const getSTDClinicBar = (count) => {
-    let width = (count / MAX_BOOKING_COUNT_STD) * 100 + 5;
+  const getCataractClinicBar = (count) => {
+    let width = (count / MAX_BOOKING_COUNT) * 100 + 5;
     if (width > 100) width = 100;
 
     if (width < 20) width = 20;
@@ -472,7 +471,7 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
             margin: "0",
             width: "100%",
             height: "100%",
-            backgroundColor: CalendarColors.STD_COLOR,
+            backgroundColor: CalendarColors.CATARACT_COLOR,
             position: "relative",
           }}
         >
@@ -503,59 +502,6 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
       </div>
     );
   };
-
-  const getBloodClinicBar = (count) => {
-    let width = (count / MAX_BOOKING_COUNT_BLOOD) * 100 + 5;
-    if (width > 100) width = 100;
-
-    if (width < 20) width = 20;
-
-    if (count === 0) {
-      width = minHeight;
-    }
-
-    const percent = 100 - width;
-
-    return (
-      <div className={classes.BloodGauge}>
-        <div
-          style={{
-            padding: "0",
-            margin: "0",
-            width: "100%",
-            height: "100%",
-            backgroundColor: CalendarColors.BLOOD_COLOR,
-            position: "relative",
-          }}
-        >
-          <div
-             style={{
-                position: "absolute",
-                bottom: "0px",
-                color: "#fff",
-                fontWeight: "500",
-                fontSize:"0.8rem",
-                textAlign: "center",
-                width: "100%",
-              }}
-          >
-            {count > 0 && count}
-          </div>
-
-          <div
-            style={{
-              padding: "0",
-              margin: "0",
-              width: "100%",
-              height: `${percent}%`,
-              backgroundColor: "#fafafa",
-            }}
-          ></div>
-        </div>
-      </div>
-    );
-  };
-
 
 
   const getBookingsCountLabel = (_bookingsCount) => {

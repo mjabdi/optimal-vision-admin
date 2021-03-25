@@ -108,8 +108,86 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-  bookingBoxSampleTaken: {
+  bookingBoxVC: {
     display: "flex",
+    marginRight: "10px",
+    marginTop: "5px",
+    padding: "7px",
+    maxWidth: "200px",
+    overflowX: "hidden",
+    fontSize: "12px",
+    fontWeight: "500",
+    cursor: "pointer",
+    backgroundColor: CalendarColors.VC_COLOR,
+    color: "#eee",
+    boxShadow: "2px 4px #fafafa",
+
+    "&:hover": {
+      // background: "#0059b3",
+      color: "#fafafa",
+    },
+  },
+  bookingBoxF2F: {
+    display: "flex",
+    marginRight: "10px",
+    marginTop: "5px",
+    padding: "7px",
+    maxWidth: "200px",
+    overflowX: "hidden",
+    fontSize: "12px",
+    fontWeight: "500",
+    cursor: "pointer",
+    backgroundColor: CalendarColors.F2F_COLOR,
+    color: "#eee",
+    boxShadow: "2px 4px #fafafa",
+
+    "&:hover": {
+      // background: "#0059b3",
+      color: "#fafafa",
+    },
+  },
+  bookingBoxLaser: {
+    display: "flex",
+    marginRight: "10px",
+    marginTop: "5px",
+    padding: "7px",
+    maxWidth: "200px",
+    overflowX: "hidden",
+    fontSize: "12px",
+    fontWeight: "500",
+    cursor: "pointer",
+    backgroundColor: CalendarColors.LASER_COLOR,
+    color: "#eee",
+    boxShadow: "2px 4px #fafafa",
+
+    "&:hover": {
+      // background: "#0059b3",
+      color: "#fafafa",
+    },
+  },
+
+  bookingBoxCataract: {
+    display: "flex",
+    marginRight: "10px",
+    marginTop: "5px",
+    padding: "7px",
+    maxWidth: "200px",
+    overflowX: "hidden",
+    fontSize: "12px",
+    fontWeight: "500",
+    cursor: "pointer",
+    backgroundColor: CalendarColors.CATARACT_COLOR,
+    color: "#eee",
+    boxShadow: "2px 4px #fafafa",
+
+    "&:hover": {
+      // background: "#0059b3",
+      color: "#fafafa",
+    },
+  },
+
+  bookingBoxHidden: {
+    display: "none",
     marginRight: "10px",
     marginTop: "5px",
     padding: "7px",
@@ -118,15 +196,21 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "12px",
     fontWeight: "500",
     cursor: "pointer",
-    backgroundColor: "#0066cc",
-    color: "#eee",
+    backgroundColor: "#fff",
+    color: "#fff",
     boxShadow: "2px 4px #fafafa",
 
     "&:hover": {
-      background: "#0059b3",
+      // background: "#0059b3",
       color: "#fafafa",
     },
   },
+
+
+
+
+
+
 
   bookingBoxPositive: {
     display: "flex",
@@ -231,11 +315,7 @@ const DayViewCell = ({ key, date, time }) => {
         setFilteredBookings(
           bookings.filter(
             (booking) =>
-              booking.fullname?.toLowerCase().indexOf(search.toLowerCase()) >=
-                0 ||
-              booking.forename?.toLowerCase().indexOf(search.toLowerCase()) >=
-                0 ||
-              booking.surname?.toLowerCase().indexOf(search.toLowerCase()) >= 0
+              booking.fullname?.toLowerCase().indexOf(search.toLowerCase()) >= 0 
           )
         );
       } else {
@@ -324,19 +404,18 @@ const DayViewCell = ({ key, date, time }) => {
     setOpenDialog(true);
   };
 
-  const getBookingClass = (status) => {
-    switch (status) {
-      case "sample_taken":
-      case "patient_attended":
-        return classes.bookingBoxSampleTaken;
-      case "positive":
-        return classes.bookingBoxPositive;
-      case "report_sent":
-      case "report_cert_sent":
-        return classes.bookingBoxReportSent;
-
+  const getBookingClass = (clinic) => {
+    switch (clinic) {
+      case "Virtual Consultation":
+        return classes.bookingBoxVC;
+      case "F2F Clinic":
+        return classes.bookingBoxF2F;
+      case "Laser Theatre":
+        return classes.bookingBoxLaser;
+      case "Cataract Theatre":
+        return classes.bookingBoxCataract;
       default:
-        return classes.bookingBox;
+        return classes.bookingBoxHidden;
     }
   };
 
@@ -375,21 +454,19 @@ const DayViewCell = ({ key, date, time }) => {
           {_bookings.map(
             (booking) =>
               state.selectedClinics.findIndex(
-                (e) => e === booking.clinic.toUpperCase()
+                (e) => e === booking.clinic
               ) >= 0 && (
                 <div
                   style={booking.tr ? { borderTop: "5px solid #d00fd6" } : {}}
                   className={clsx(
-                    getBookingClass(booking.status),
-                    getBookingBorderClass(booking.clinic)
+                    getBookingClass(booking.clinic),
+                    // getBookingBorderClass(booking.clinic)
                   )}
                   onClick={(event) => bookingCliked(event, booking)}
                 >
                   {`${
                     booking.fullname
-                      ? booking.fullname
-                      : `${booking.forename} ${booking.surname}`
-                  }`.substring(0, 15)}
+                  }`.substring(0, 30)}
                 </div>
               )
           )}
