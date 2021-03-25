@@ -12,6 +12,7 @@ import { CalendarColors } from "./colors";
 import clsx from "clsx";
 
 import NewOVDialog from "../NewOVBookingDialog";
+import EditOVBookingDialog from "../EditOVBookingDialog";
 
 const useStyles = makeStyles((theme) => ({
   Container: {
@@ -87,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     marginRight: "10px",
     marginTop: "5px",
-    padding: "10px",
+    padding: "6px 10px",
     maxWidth: "150px",
     overflowX: "hidden",
     border: "1px solid #ddd",
@@ -501,10 +502,13 @@ const DayViewCell = ({ key, date, time }) => {
         {getBookingsBox(filteredBookings)}
       </div>
 
-      <BookingDialog
+      <EditOVBookingDialog
         booking={selectedBooking}
         open={openDialog}
-        onClose={handleCloseDialog}
+        date={date}
+        time={time}
+        clinic={selectedBooking?.clinic}
+        handleClose={handleCloseDialog}
       />
 
       <NewBookingDialog

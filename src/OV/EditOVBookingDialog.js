@@ -7,6 +7,7 @@ import {
     Checkbox,
     CircularProgress,
     DialogActions,
+    DialogContentText,
     Divider,
     FormControlLabel,
     Grid,
@@ -50,6 +51,8 @@ import { validate } from "email-validator";
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import { CalendarColors } from "./calendar-admin/colors";
 import DateField from "./DateField";
+
+import EditIcon from '@material-ui/icons/Edit';
 
 var interval;
 
@@ -299,7 +302,7 @@ function PaperComponent(props) {
     );
 }
 
-export default function NewOVBookingDialog(props) {
+export default function EditOVBookingDialog(props) {
     const classes = useStyles();
 
     const [state, setState] = React.useContext(GlobalState);
@@ -314,6 +317,24 @@ export default function NewOVBookingDialog(props) {
 
     const [birthDate, setBirthDate] = React.useState("");
     const [birthDateError, setBirthDateError] = React.useState(false);
+
+    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
+
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false)
+    }
+
+
+    React.useEffect(() => {
+        if (props.booking) {
+            setFullname(props.booking.fullname)
+            setPhone(props.booking.phone)
+            setEmail(props.booking.email)
+            setBirthDate(props.booking.birthDate)
+            setNotes(props.booking.notes)
+        }
+
+    }, [props.open, props.booking])
 
 
     const birthDateChanged = (dateStr) => {
@@ -363,14 +384,35 @@ export default function NewOVBookingDialog(props) {
             error = true;
         }
 
-        if (birthDate && birthDate.length >= 1 && birthDate.length < 10)
-        {
+        if (birthDate && birthDate.length >= 1 && birthDate.length < 10) {
             setBirthDateError(true);
             error = true;
         }
 
         return !error;
     };
+
+    const deleteClicked = async () => {
+
+        setOpenDeleteDialog(false)
+
+        setSaving(true)
+        try {
+            await BookService.deleteBooking(props.booking._id)
+            setSaving(false)
+            setState((state) => ({
+                ...state,
+                bookingDialogDataChanged: !state.bookingDialogDataChanged
+                    ? true
+                    : false,
+            }));
+            handleClose();
+        }
+        catch (err) {
+            console.error(err)
+            setSaving(false)
+        }
+    }
 
     const saveClicked = async () => {
         if (!validateBooking()) {
@@ -380,7 +422,8 @@ export default function NewOVBookingDialog(props) {
         setSaving(true);
 
         try {
-            await BookService.addNewBooking({
+            await BookService.updateBooking({
+                bookingId: props.booking._id,
                 bookingDate: props.date,
                 bookingTime: props.time,
                 fullname: fullname,
@@ -440,9 +483,9 @@ export default function NewOVBookingDialog(props) {
                                     spacing={1}
                                 >
                                     <Grid item>
-                                        <AddIcon style={{ fontSize: "2.5rem" }} />
+                                        <EditIcon style={{ fontSize: "2rem" }} />
                                     </Grid>
-                                    <Grid item style={{ marginTop: "-12px" }}>
+                                    <Grid item style={{ marginTop: "-10px" }}>
                                         {props.clinic}
 
                                     </Grid>
@@ -465,7 +508,7 @@ export default function NewOVBookingDialog(props) {
                                     spacing={2}
                                     alignItems="center"
                                 >
-                                    <Grid item xs={12} style={{marginTop:"10px"}}> 
+                                    <Grid item xs={12} style={{ marginTop: "10px" }}>
                                         <Grid
                                             container
                                             direction="row"
@@ -575,27 +618,74 @@ export default function NewOVBookingDialog(props) {
                             >
                                 <Grid item>
                                     <Button
+                                        onClick={() => setOpenDeleteDialog(true)}
+                                        variant="contained"
+                                        color="primary"
+                                        // style={{ width: "100px" }}
+                                        style={{ backgroundColor: "#c70000", color: "#fff" }}
+                                        disabled={saving}
+                                    >
+                                        Delete Appointment
+                                      </Button>
+                                </Grid>
+
+                                <Grid item>
+                                    <div style={{ width: "120px" }}></div>
+                                </Grid>
+
+                                <Grid item>
+                                    <Button
                                         onClick={handleClose}
                                         style={{ width: "100px" }}
                                         disabled={saving}
                                     >
                                         back
-                      </Button>
+                                     </Button>
                                 </Grid>
                                 <Grid item>
                                     <Button
                                         onClick={saveClicked}
                                         variant="contained"
-                                        color="secondary"
+                                        color="primary"
                                         // style={{ width: "100px" }}
+                                        style={{ backgroundColor: "#ff7200", color: "#fff" }}
                                         disabled={saving}
                                     >
-                                       Book Appointment
-                      </Button>
+                                        Save Changes
+                                      </Button>
                                 </Grid>
+
                             </Grid>
 
                         </DialogActions>
+
+                        <Dialog
+                            open={openDeleteDialog}
+                            onClose={handleCloseDeleteDialog}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogTitle style={{ color: "#d10202", fontWeight: "600" }} id="alert-dialog-title">
+                                {"Delete Appointment"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText
+                                    style={{ color: "#000", fontWeight: "500" }}
+                                    id="alert-dialog-description"
+                                >
+                                    Are you sure you want to delete this appointment?
+              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseDeleteDialog} color="default">
+                                    Back
+                                 </Button>
+                                <Button onClick={deleteClicked} variant="contained" style={{ backgroundColor: "#d10202", color:"#fff" }}>
+                                    Yes, Delete this appointment
+                                 </Button>
+                            </DialogActions>
+                        </Dialog>
+
                     </Dialog>
                 </React.Fragment>
             )}
