@@ -344,7 +344,7 @@ const DayViewCell = ({ key, date, time }) => {
           record.method === "getBookingsByDateStrandTime" &&
           record.query === `${date}${time}`
       )?.res;
-      if (!res || openDialog || openDialogAddNew) {
+      if (!res || openDialog || openDialogAddNew || true) {
         res = await BookService.getAllBookingsByDateStrandTime(date, time);
         setState((state) => ({
           ...state,

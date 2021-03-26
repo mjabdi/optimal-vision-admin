@@ -53,6 +53,7 @@ import { CalendarColors } from "./calendar-admin/colors";
 import DateField from "./DateField";
 
 import EditIcon from '@material-ui/icons/Edit';
+import DateDialog from "./DateDialog";
 
 var interval;
 
@@ -320,8 +321,23 @@ export default function EditOVBookingDialog(props) {
 
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
 
+    const [openDateDialog, setOpenDateDialog] = React.useState(false)
+
+    const [date, setDate] = React.useState("")
+    const [time, setTime] = React.useState("")
+
     const handleCloseDeleteDialog = () => {
         setOpenDeleteDialog(false)
+    }
+
+    const handleSaveDateDialog = (date, time) => {
+        setDate(date)
+        setTime(time)
+        setOpenDateDialog(false)
+    }
+
+    const handleCloseDateDialog = () => {
+        setOpenDateDialog(false)
     }
 
 
@@ -332,6 +348,8 @@ export default function EditOVBookingDialog(props) {
             setEmail(props.booking.email)
             setBirthDate(props.booking.birthDate)
             setNotes(props.booking.notes)
+            setDate(props.date)
+            setTime(props.time)
         }
 
     }, [props.open, props.booking])
@@ -424,8 +442,8 @@ export default function EditOVBookingDialog(props) {
         try {
             await BookService.updateBooking({
                 bookingId: props.booking._id,
-                bookingDate: props.date,
-                bookingTime: props.time,
+                bookingDate: date,
+                bookingTime: time,
                 fullname: fullname,
                 phone: phone,
                 email: email,
@@ -515,13 +533,14 @@ export default function EditOVBookingDialog(props) {
                                             justify="center"
                                             alignItems="center"
                                             spacing={1}
+                                            style={{cursor:"pointer"}} onClick={() => setOpenDateDialog(true)}
                                         >
                                             <Grid item>
                                                 <DateRangeIcon className={classes.CalendarIcon} />
                                             </Grid>
                                             <Grid item>
                                                 <span className={classes.DateTimeLabel}>
-                                                    {props.date} , {props.time}
+                                                    {date} , {time}
                                                 </span>
                                             </Grid>
                                         </Grid>
@@ -687,6 +706,16 @@ export default function EditOVBookingDialog(props) {
                         </Dialog>
 
                     </Dialog>
+
+                    <DateDialog
+                     open={openDateDialog}
+                     handleClose={handleCloseDateDialog}
+                     handleOK={handleSaveDateDialog}
+                     date={date}
+                     time={time}>
+
+                     </DateDialog>
+
                 </React.Fragment>
             )}
         </React.Fragment>

@@ -104,7 +104,7 @@ const DateField = ({title, value, dateChanged, error}) => {
             months.push(dateformat(new Date(2020,i,5), 'mmmm'));
         }
 
-        for ( i = 1900 ; i < new Date().getFullYear(); i++)
+        for ( i = 1900 ; i <= new Date().getFullYear()+1; i++)
         {
             years.push(i);
         }
