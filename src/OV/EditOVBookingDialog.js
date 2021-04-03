@@ -316,6 +316,11 @@ export default function EditOVBookingDialog(props) {
     const [email, setEmail] = React.useState("");
     const [notes, setNotes] = React.useState("");
 
+    const [patientID, setPatientID] = React.useState("");
+    const [prescriptionLeft, setPrescriptionLeft] = React.useState("");
+    const [prescriptionRight, setPrescriptionRight] = React.useState("");
+
+
     const [birthDate, setBirthDate] = React.useState("");
     const [birthDateError, setBirthDateError] = React.useState(false);
 
@@ -325,6 +330,19 @@ export default function EditOVBookingDialog(props) {
 
     const [date, setDate] = React.useState("")
     const [time, setTime] = React.useState("")
+
+    const patientIDChanged = (event) => {
+        setPatientID(event.target.value);
+    };
+
+    const prescriptionLeftChanged = (event) => {
+        setPrescriptionLeft(event.target.value);
+    };
+
+    const prescriptionRightChanged = (event) => {
+        setPrescriptionRight(event.target.value);
+    };
+
 
     const handleCloseDeleteDialog = () => {
         setOpenDeleteDialog(false)
@@ -350,6 +368,10 @@ export default function EditOVBookingDialog(props) {
             setNotes(props.booking.notes)
             setDate(props.date)
             setTime(props.time)
+            setPatientID(props.booking.patientID)
+            setPrescriptionLeft(props.booking.prescriptionLeft)
+            setPrescriptionRight(props.booking.prescriptionRight)
+
         }
 
     }, [props.open, props.booking])
@@ -390,6 +412,10 @@ export default function EditOVBookingDialog(props) {
         setEmail("");
         setNotes("");
         setBirthDate("")
+        setPatientID("")
+        setPrescriptionLeft("")
+        setPrescriptionRight("")
+
 
         props.handleClose();
         setSaving(false);
@@ -449,7 +475,10 @@ export default function EditOVBookingDialog(props) {
                 email: email,
                 birthDate: birthDate,
                 notes: notes,
-                clinic: props.clinic
+                clinic: props.clinic,
+                patientID: patientID,
+                prescriptionLeft: prescriptionLeft,
+                prescriptionRight: prescriptionRight
             });
             setSaving(false);
             setState((state) => ({
@@ -473,8 +502,11 @@ export default function EditOVBookingDialog(props) {
                 return CalendarColors.F2F_COLOR
             case "Laser Theatre":
                 return CalendarColors.LASER_COLOR
-            case "Cataract Theatre":
+            case "Lens Theatre":
                 return CalendarColors.CATARACT_COLOR
+                case "Post OP":
+                    return CalendarColors.POSTOP_COLOR
+    
             default:
                 return "#777"
 
@@ -486,7 +518,7 @@ export default function EditOVBookingDialog(props) {
             {props.date && props.time && (
                 <React.Fragment>
                     <Dialog
-                        maxWidth="sm"
+                        maxWidth="md"
                         open={props.open}
                         onClose={handleClose}
                         PaperComponent={PaperComponent}
@@ -533,7 +565,7 @@ export default function EditOVBookingDialog(props) {
                                             justify="center"
                                             alignItems="center"
                                             spacing={1}
-                                            style={{cursor:"pointer"}} onClick={() => setOpenDateDialog(true)}
+                                            style={{ cursor: "pointer" }} onClick={() => setOpenDateDialog(true)}
                                         >
                                             <Grid item>
                                                 <DateRangeIcon className={classes.CalendarIcon} />
@@ -546,7 +578,7 @@ export default function EditOVBookingDialog(props) {
                                         </Grid>
                                     </Grid>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth
                                             autoFocus
@@ -561,7 +593,20 @@ export default function EditOVBookingDialog(props) {
                                         />
                                     </Grid>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} md={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Patient ID"
+                                            value={patientID}
+                                            onChange={patientIDChanged}
+                                            name="patientid"
+                                            id="patientid-id"
+                                            autoComplete="none"
+                                        />
+                                    </Grid>
+
+
+                                    <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth
                                             label="Telephone"
@@ -573,7 +618,7 @@ export default function EditOVBookingDialog(props) {
                                         />
                                     </Grid>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth
                                             label="Email"
@@ -596,7 +641,29 @@ export default function EditOVBookingDialog(props) {
                                         </DateField>
                                     </Grid>
 
+                                    <Grid item xs={12} md={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Prescription (LEFT)"
+                                            value={prescriptionLeft}
+                                            onChange={prescriptionLeftChanged}
+                                            name="pleft"
+                                            id="pleft-id"
+                                            autoComplete="none"
+                                        />
+                                    </Grid>
 
+                                    <Grid item xs={12} md={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Prescription (RIGHT)"
+                                            value={prescriptionRight}
+                                            onChange={prescriptionRightChanged}
+                                            name="pright"
+                                            id="pright-id"
+                                            autoComplete="none"
+                                        />
+                                    </Grid>
 
                                     <Grid item xs={12}>
                                         <TextField
@@ -609,6 +676,21 @@ export default function EditOVBookingDialog(props) {
                                             autoComplete="none"
                                         />
                                     </Grid>
+
+                                    <Grid item xs={12} style={{marginTop:"20px"}}>
+                                    <Button
+                                        onClick={() => setOpenDeleteDialog(true)}
+                                        variant="contained"
+                                        fullWidth
+                                        color="primary"
+                                        // style={{ width: "100px" }}
+                                        style={{ backgroundColor: "#c70000", color: "#fff" }}
+                                        disabled={saving}
+                                    >
+                                        Delete Appointment
+                                      </Button>
+                                </Grid>
+
 
                                 </Grid>
 
@@ -633,24 +715,8 @@ export default function EditOVBookingDialog(props) {
                                 direction="row"
                                 justify="flex-end"
                                 alignItems="center"
-                                spacing={1}
+                                spacing={2}
                             >
-                                <Grid item>
-                                    <Button
-                                        onClick={() => setOpenDeleteDialog(true)}
-                                        variant="contained"
-                                        color="primary"
-                                        // style={{ width: "100px" }}
-                                        style={{ backgroundColor: "#c70000", color: "#fff" }}
-                                        disabled={saving}
-                                    >
-                                        Delete Appointment
-                                      </Button>
-                                </Grid>
-
-                                <Grid item>
-                                    <div style={{ width: "120px" }}></div>
-                                </Grid>
 
                                 <Grid item>
                                     <Button
@@ -673,6 +739,10 @@ export default function EditOVBookingDialog(props) {
                                         Save Changes
                                       </Button>
                                 </Grid>
+
+                                {/* <div style={{position:"absolute", left:"10px", bottom:"5px"}}> */}
+                                {/* </div> */}
+
 
                             </Grid>
 
@@ -699,7 +769,7 @@ export default function EditOVBookingDialog(props) {
                                 <Button onClick={handleCloseDeleteDialog} color="default">
                                     Back
                                  </Button>
-                                <Button onClick={deleteClicked} variant="contained" style={{ backgroundColor: "#d10202", color:"#fff" }}>
+                                <Button onClick={deleteClicked} variant="contained" style={{ backgroundColor: "#d10202", color: "#fff" }}>
                                     Yes, Delete this appointment
                                  </Button>
                             </DialogActions>
@@ -708,13 +778,13 @@ export default function EditOVBookingDialog(props) {
                     </Dialog>
 
                     <DateDialog
-                     open={openDateDialog}
-                     handleClose={handleCloseDateDialog}
-                     handleOK={handleSaveDateDialog}
-                     date={date}
-                     time={time}>
+                        open={openDateDialog}
+                        handleClose={handleCloseDateDialog}
+                        handleOK={handleSaveDateDialog}
+                        date={date}
+                        time={time}>
 
-                     </DateDialog>
+                    </DateDialog>
 
                 </React.Fragment>
             )}

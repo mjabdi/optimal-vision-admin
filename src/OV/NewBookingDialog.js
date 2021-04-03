@@ -295,6 +295,26 @@ const useStyles = makeStyles((theme) => ({
   
   },
 
+  BoxPostOP: {
+    width : "100%",
+    padding: "10px",
+    borderRadius: "8px",
+    border: "1px solid",
+    fontSize: "1.2rem",
+    fontWeight: "500",
+    textAlign: "center",
+    cursor: "pointer",
+    borderColor: CalendarColors.POSTOP_COLOR,
+    color: CalendarColors.POSTOP_COLOR,
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: CalendarColors.POSTOP_COLOR,
+      color: "#fff"
+    }
+  
+  },
+
+
 
 
 
@@ -512,7 +532,7 @@ export default function NewBookingDialog(props) {
             <DialogContent>
               <div
                 style={{
-                  height: "380px",
+                  height: "440px",
                 }}
               >
                 <Grid
@@ -558,8 +578,13 @@ export default function NewBookingDialog(props) {
                     </div>
                   </Grid>
                   <Grid item xs={12}>
-                    <div className={classes.BoxCataract} onClick={() => clinicClicked("Cataract Theatre")}>
-                      Cataract Theatre
+                    <div className={classes.BoxCataract} onClick={() => clinicClicked("Lens Theatre")}>
+                      Lens Theatre
+                    </div>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <div className={classes.BoxPostOP} onClick={() => clinicClicked("Post OP")}>
+                      Post OP
                     </div>
                   </Grid>
 

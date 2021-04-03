@@ -312,6 +312,11 @@ export default function NewOVBookingDialog(props) {
     const [email, setEmail] = React.useState("");
     const [notes, setNotes] = React.useState("");
 
+    const [patientID, setPatientID] = React.useState("");
+    const [prescriptionLeft, setPrescriptionLeft] = React.useState("");
+    const [prescriptionRight, setPrescriptionRight] = React.useState("");
+
+
     const [birthDate, setBirthDate] = React.useState("");
     const [birthDateError, setBirthDateError] = React.useState(false);
 
@@ -341,6 +346,19 @@ export default function NewOVBookingDialog(props) {
         setNotes(event.target.value);
     };
 
+    const patientIDChanged = (event) => {
+        setPatientID(event.target.value);
+    };
+
+    const prescriptionLeftChanged = (event) => {
+        setPrescriptionLeft(event.target.value);
+    };
+
+    const prescriptionRightChanged = (event) => {
+        setPrescriptionRight(event.target.value);
+    };
+
+
     const handleClose = () => {
         if (saving) return;
 
@@ -351,6 +369,9 @@ export default function NewOVBookingDialog(props) {
         setEmail("");
         setNotes("");
         setBirthDate("")
+        setPatientID("")
+        setPrescriptionLeft("")
+        setPrescriptionRight("")
 
         props.handleClose();
         setSaving(false);
@@ -388,7 +409,10 @@ export default function NewOVBookingDialog(props) {
                 email: email,
                 birthDate: birthDate,
                 notes: notes,
-                clinic: props.clinic
+                clinic: props.clinic,
+                patientID: patientID,
+                prescriptionLeft: prescriptionLeft,
+                prescriptionRight: prescriptionRight
             });
             setSaving(false);
             setState((state) => ({
@@ -412,8 +436,11 @@ export default function NewOVBookingDialog(props) {
                 return CalendarColors.F2F_COLOR
             case "Laser Theatre":
                 return CalendarColors.LASER_COLOR
-            case "Cataract Theatre":
+            case "Lens Theatre":
                 return CalendarColors.CATARACT_COLOR
+                case "Post OP":
+                    return CalendarColors.POSTOP_COLOR
+       
             default:
                 return "#777"
 
@@ -425,7 +452,7 @@ export default function NewOVBookingDialog(props) {
             {props.date && props.time && (
                 <React.Fragment>
                     <Dialog
-                        maxWidth="sm"
+                        maxWidth="md"
                         open={props.open}
                         onClose={handleClose}
                         PaperComponent={PaperComponent}
@@ -484,7 +511,7 @@ export default function NewOVBookingDialog(props) {
                                         </Grid>
                                     </Grid>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth
                                             autoFocus
@@ -499,7 +526,20 @@ export default function NewOVBookingDialog(props) {
                                         />
                                     </Grid>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} md={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Patient ID"
+                                            value={patientID}
+                                            onChange={patientIDChanged}
+                                            name="patientid"
+                                            id="patientid-id"
+                                            autoComplete="none"
+                                        />
+                                    </Grid>
+
+
+                                    <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth
                                             label="Telephone"
@@ -511,7 +551,7 @@ export default function NewOVBookingDialog(props) {
                                         />
                                     </Grid>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth
                                             label="Email"
@@ -534,7 +574,29 @@ export default function NewOVBookingDialog(props) {
                                         </DateField>
                                     </Grid>
 
+                                    <Grid item xs={12} md={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Prescription (LEFT)"
+                                            value={prescriptionLeft}
+                                            onChange={prescriptionLeftChanged}
+                                            name="pleft"
+                                            id="pleft-id"
+                                            autoComplete="none"
+                                        />
+                                    </Grid>
 
+                                    <Grid item xs={12} md={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Prescription (RIGHT)"
+                                            value={prescriptionRight}
+                                            onChange={prescriptionRightChanged}
+                                            name="pright"
+                                            id="pright-id"
+                                            autoComplete="none"
+                                        />
+                                    </Grid>
 
                                     <Grid item xs={12}>
                                         <TextField
@@ -547,7 +609,6 @@ export default function NewOVBookingDialog(props) {
                                             autoComplete="none"
                                         />
                                     </Grid>
-
                                 </Grid>
 
                                 <div

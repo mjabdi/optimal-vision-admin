@@ -287,9 +287,13 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
         {clinic === "Laser Theatre" &&
           state.selectedClinics.findIndex((e) => e === "Laser Theatre") >= 0 &&
           getLaserClinicBar(count)}
-        {clinic === "Cataract Theatre" &&
-          state.selectedClinics.findIndex((e) => e === "Cataract Theatre") >= 0 &&
+        {clinic === "Lens Theatre" &&
+          state.selectedClinics.findIndex((e) => e === "Lens Theatre") >= 0 &&
           getCataractClinicBar(count)}
+                 {clinic === "Post OP" &&
+          state.selectedClinics.findIndex((e) => e === "Post OP") >= 0 &&
+          getPostOPClinicBar(count)}
+ 
       </React.Fragment>
     );
   };
@@ -502,6 +506,59 @@ const MonthViewCell = ({ key, cellIndex, month, daysInMonth, dayClicked }) => {
       </div>
     );
   };
+
+  const getPostOPClinicBar = (count) => {
+    let width = (count / MAX_BOOKING_COUNT) * 100 + 5;
+    if (width > 100) width = 100;
+
+    if (width < 20) width = 20;
+
+    if (count === 0) {
+      width = minHeight;
+    }
+
+    const percent = 100 - width;
+
+    return (
+      <div className={classes.BloodGauge}>
+        <div
+          style={{
+            padding: "0",
+            margin: "0",
+            width: "100%",
+            height: "100%",
+            backgroundColor: CalendarColors.POSTOP_COLOR,
+            position: "relative",
+          }}
+        >
+          <div
+             style={{
+                position: "absolute",
+                bottom: "0px",
+                color: "#fff",
+                fontWeight: "500",
+                fontSize:"0.8rem",
+                textAlign: "center",
+                width: "100%",
+              }}
+          >
+            {count > 0 && count}
+          </div>
+
+          <div
+            style={{
+              padding: "0",
+              margin: "0",
+              width: "100%",
+              height: `${percent}%`,
+              backgroundColor: "#fafafa",
+            }}
+          ></div>
+        </div>
+      </div>
+    );
+  };
+
 
 
   const getBookingsCountLabel = (_bookingsCount) => {

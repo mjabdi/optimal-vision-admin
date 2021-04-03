@@ -187,6 +187,27 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
+  bookingBoxPostOP: {
+    display: "flex",
+    marginRight: "10px",
+    marginTop: "5px",
+    padding: "7px",
+    maxWidth: "200px",
+    overflowX: "hidden",
+    fontSize: "12px",
+    fontWeight: "500",
+    cursor: "pointer",
+    backgroundColor: CalendarColors.POSTOP_COLOR,
+    color: "#eee",
+    boxShadow: "2px 4px #fafafa",
+
+    "&:hover": {
+      // background: "#0059b3",
+      color: "#fafafa",
+    },
+  },
+
+
   bookingBoxHidden: {
     display: "none",
     marginRight: "10px",
@@ -413,8 +434,11 @@ const DayViewCell = ({ key, date, time }) => {
         return classes.bookingBoxF2F;
       case "Laser Theatre":
         return classes.bookingBoxLaser;
-      case "Cataract Theatre":
+      case "Lens Theatre":
         return classes.bookingBoxCataract;
+        case "Post OP":
+          return classes.bookingBoxPostOP;
+  
       default:
         return classes.bookingBoxHidden;
     }
