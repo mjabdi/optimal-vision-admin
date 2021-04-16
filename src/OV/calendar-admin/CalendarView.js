@@ -21,7 +21,7 @@ const Clinics = [
     {clinic: "Laser Theatre", color: CalendarColors.LASER_COLOR},
     {clinic: "Lens Theatre", color: CalendarColors.CATARACT_COLOR},
     {clinic: "Post OP", color: CalendarColors.POSTOP_COLOR},
-
+    {clinic: "Optometry", color: CalendarColors.OPOTOMETRY_COLOR},
 ]
 
 const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -292,7 +292,7 @@ export default function CalendarView() {
                    {Clinics.map( item => (
                        <Grid item>
                            <div 
-                                style={state.selectedClinics?.findIndex(e => e === item.clinic) >= 0 ? {border:`1px solid ${item.color}`, backgroundColor:`${item.color}`, color:"#fff" ,fontSize:"0.95rem", fontWeight:"500", padding:"5px", width:"170px" , textAlign:"center", cursor:"pointer", borderRadius:"4px"}   : {border:`1px solid ${item.color}`, color:`${item.color}`, fontSize:"0.95rem", fontWeight:"500", padding:"5px", width:"170px", textAlign:"center", cursor:"pointer", borderRadius:"4px"}}
+                                style={state.selectedClinics?.findIndex(e => e === item.clinic) >= 0 ? {border:`1px solid ${item.color}`, backgroundColor:`${item.color}`, color:"#fff" ,fontSize:"0.85rem", fontWeight:"500", padding:"5px", width:"150px" , textAlign:"center", cursor:"pointer", borderRadius:"4px"}   : {border:`1px solid ${item.color}`, color:`${item.color}`, fontSize:"0.85rem", fontWeight:"500", padding:"5px", width:"150px", textAlign:"center", cursor:"pointer", borderRadius:"4px"}}
                                 onClick= {() => clinicClicked(item.clinic)}   
                                 > 
                                {item.clinic}

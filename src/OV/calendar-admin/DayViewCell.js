@@ -207,6 +207,27 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
+  bookingBoxOptometry: {
+    display: "flex",
+    marginRight: "10px",
+    marginTop: "5px",
+    padding: "7px",
+    maxWidth: "200px",
+    overflowX: "hidden",
+    fontSize: "12px",
+    fontWeight: "500",
+    cursor: "pointer",
+    backgroundColor: CalendarColors.OPOTOMETRY_COLOR,
+    color: "#eee",
+    boxShadow: "2px 4px #fafafa",
+
+    "&:hover": {
+      // background: "#0059b3",
+      color: "#fafafa",
+    },
+  },
+
+
 
   bookingBoxHidden: {
     display: "none",
@@ -438,6 +459,9 @@ const DayViewCell = ({ key, date, time }) => {
         return classes.bookingBoxCataract;
         case "Post OP":
           return classes.bookingBoxPostOP;
+          case "Optometry":
+            return classes.bookingBoxOptometry;
+      
   
       default:
         return classes.bookingBoxHidden;

@@ -14,6 +14,8 @@ import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import DateRangeIcon from "@material-ui/icons/DateRange";
 import EventNoteIcon from "@material-ui/icons/EventNote";
 import AirplanemodeActiveIcon from "@material-ui/icons/AirplanemodeActive";
+import AccessibilityIcon from '@material-ui/icons/Accessibility';
+
 /// PCR ------------------
 import FindByRef from "./PCR/FindByRef";
 import BookingTable from "./PCR/BookingTable";
@@ -47,6 +49,7 @@ import STDCalendarView from "./STD/calendar-admin/CalendarView";
 // OV Admin ----------------
 import OVBookingTable from "./OV/BookingTable";
 import OVCalendarView from "./OV/calendar-admin/CalendarView";
+import PatientsTable from "./OV/PatientsTable";
 
 //---------------
 
@@ -93,6 +96,13 @@ export const MenuList_OV_Admin = [
     title: `Calendar View`,
     icon: <DateRangeIcon />,
   },
+  {
+    index: 8,
+    id: `patientsList`,
+    title: `Patients`,
+    icon: <AccessibilityIcon />,
+  },
+
 
 
 ];
@@ -388,8 +398,11 @@ export const getMenuContent = (role, index) => {
         return <OVBookingTable date="all" />;
       case 6:
         return <OVBookingTable date="deleted" />;
-        case 7:
-          return <OVCalendarView />;  
+      case 7:
+        return <OVCalendarView />;  
+      case 8:
+        return <PatientsTable />;  
+  
       default:
         return `Page Not Found!`;
     }

@@ -11,7 +11,8 @@ export const CalendarColors = {
     F2F_COLOR : "#8600d4",
     LASER_COLOR :  "#d1005e",
     CATARACT_COLOR : "#00919e",
-    POSTOP_COLOR: "#9e6c00"
+    POSTOP_COLOR: "#9e6c00",
+    OPOTOMETRY_COLOR: "#007d0c"
 
 
 }

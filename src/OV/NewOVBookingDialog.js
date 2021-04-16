@@ -438,9 +438,11 @@ export default function NewOVBookingDialog(props) {
                 return CalendarColors.LASER_COLOR
             case "Lens Theatre":
                 return CalendarColors.CATARACT_COLOR
-                case "Post OP":
-                    return CalendarColors.POSTOP_COLOR
-       
+            case "Post OP":
+                return CalendarColors.POSTOP_COLOR
+            case "Optometry":
+                return CalendarColors.OPOTOMETRY_COLOR
+           
             default:
                 return "#777"
 

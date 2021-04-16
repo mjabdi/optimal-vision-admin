@@ -490,7 +490,7 @@ function PaperComponent(props) {
   );
 }
 
-export default function NewBookingDialog(props) {
+export default function ChooseBookingDialog(props) {
   const classes = useStyles();
 
   const [state, setState] = React.useContext(GlobalState);
@@ -512,7 +512,6 @@ export default function NewBookingDialog(props) {
 
   return (
     <React.Fragment>
-      {props.date && props.time && (
         <React.Fragment>
           <Dialog
             maxWidth="xs"
@@ -524,14 +523,14 @@ export default function NewBookingDialog(props) {
             <DialogTitle id="draggable-dialog-title">
               <Grid
                 container
-                spacing={1}
+                spacing={2}
                 direction="row"
                 justify="center"
                 alignItems="center"
               >
-                <Grid item>
+                {/* <Grid item>
                   <AddIcon style={{ color: "#f50057", fontSize: "3rem" }} />
-                </Grid>
+                </Grid> */}
 
                 <Grid item>
                   <div
@@ -542,7 +541,7 @@ export default function NewBookingDialog(props) {
                     }}
                   >
                     {" "}
-                    ADD New Booking{" "}
+                    Change Clinic{" "}
                   </div>
                 </Grid>
               </Grid>
@@ -552,7 +551,7 @@ export default function NewBookingDialog(props) {
             <DialogContent>
               <div
                 style={{
-                  height: "480px",
+                  height: "420px",
                 }}
               >
                 <Grid
@@ -562,24 +561,6 @@ export default function NewBookingDialog(props) {
                   spacing={2}
                   alignItems="center"
                 >
-                  <Grid item xs={12}>
-                    <Grid
-                      container
-                      direction="row"
-                      justify="center"
-                      alignItems="center"
-                      spacing={0}
-                    >
-                      <Grid item>
-                        <DateRangeIcon className={classes.CalendarIcon} />
-                      </Grid>
-                      <Grid item>
-                        <span className={classes.DateTimeLabel}>
-                          {props.date} , {props.time}
-                        </span>
-                      </Grid>
-                    </Grid>
-                  </Grid>
 
 
                   <Grid item xs={12} style={{marginTop:"0px"}}>
@@ -646,7 +627,6 @@ export default function NewBookingDialog(props) {
             </DialogContent>
           </Dialog>
         </React.Fragment>
-      )}
     </React.Fragment>
   );
 }

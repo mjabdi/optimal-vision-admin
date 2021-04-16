@@ -54,6 +54,7 @@ import DateField from "./DateField";
 
 import EditIcon from '@material-ui/icons/Edit';
 import DateDialog from "./DateDialog";
+import ChooseClinicDialog from "./ChooseClinicDialog"
 
 var interval;
 
@@ -309,6 +310,10 @@ export default function EditOVBookingDialog(props) {
     const [state, setState] = React.useContext(GlobalState);
     const [saving, setSaving] = useState(false);
 
+    const [openClinicDialog, setOpenClinicDialog] = React.useState(false)
+
+    const [clinic, setClinic] = React.useState("")
+
     const [fullname, setFullname] = React.useState("");
     const [fullnameError, setFullnameError] = React.useState(false);
 
@@ -372,6 +377,8 @@ export default function EditOVBookingDialog(props) {
             setPrescriptionLeft(props.booking.prescriptionLeft)
             setPrescriptionRight(props.booking.prescriptionRight)
 
+            setClinic(props.clinic)
+
         }
 
     }, [props.open, props.booking])
@@ -415,6 +422,7 @@ export default function EditOVBookingDialog(props) {
         setPatientID("")
         setPrescriptionLeft("")
         setPrescriptionRight("")
+        setClinic("")
 
 
         props.handleClose();
@@ -475,10 +483,10 @@ export default function EditOVBookingDialog(props) {
                 email: email,
                 birthDate: birthDate,
                 notes: notes,
-                clinic: props.clinic,
+                clinic: clinic,
                 patientID: patientID,
                 prescriptionLeft: prescriptionLeft,
-                prescriptionRight: prescriptionRight
+                prescriptionRight: prescriptionRight,
             });
             setSaving(false);
             setState((state) => ({
@@ -494,6 +502,42 @@ export default function EditOVBookingDialog(props) {
         }
     };
 
+    const saveAsClicked = async () => {
+        if (!validateBooking()) {
+            return;
+        }
+
+        setSaving(true);
+
+        try {
+            await BookService.addNewBooking({
+                bookingDate: date,
+                bookingTime: time,
+                fullname: fullname,
+                phone: phone,
+                email: email,
+                birthDate: birthDate,
+                notes: notes,
+                clinic: clinic,
+                patientID: patientID,
+                prescriptionLeft: prescriptionLeft,
+                prescriptionRight: prescriptionRight,
+            });
+            setSaving(false);
+            setState((state) => ({
+                ...state,
+                bookingDialogDataChanged: !state.bookingDialogDataChanged
+                    ? true
+                    : false,
+            }));
+            handleClose();
+        } catch (err) {
+            console.error(err);
+            setSaving(false);
+        }
+    };
+
+
     const getColorFromClinic = (clinic) => {
         switch (clinic) {
             case "Virtual Consultation":
@@ -504,14 +548,36 @@ export default function EditOVBookingDialog(props) {
                 return CalendarColors.LASER_COLOR
             case "Lens Theatre":
                 return CalendarColors.CATARACT_COLOR
-                case "Post OP":
-                    return CalendarColors.POSTOP_COLOR
+            case "Post OP":
+                return CalendarColors.POSTOP_COLOR
+            case "Optometry":
+                return CalendarColors.OPOTOMETRY_COLOR
+    
     
             default:
                 return "#777"
 
         }
     }
+
+    const handleClinicClicked = (_clinic) =>
+    {
+        setClinic(_clinic)
+        setOpenClinicDialog(false)
+    }
+
+    const handleCloseClinicDialog = () =>
+    {
+        setOpenClinicDialog(false)
+    }
+    
+    const editClinicClicked = () =>
+    {
+        setOpenClinicDialog(true)
+    }
+
+    
+
 
     return (
         <React.Fragment>
@@ -526,18 +592,19 @@ export default function EditOVBookingDialog(props) {
                     >
                         <DialogTitle id="draggable-dialog-title">
 
-                            <div style={{ position: "absolute", left: "0px", top: "0px", width: "100%", backgroundColor: getColorFromClinic(props.clinic), color: "#fff", padding: "15px 5px", textAlign: "center", fontSize: "1.5rem" }}>
+                            <div style={{ position: "absolute", left: "0px", top: "0px", width: "100%", backgroundColor: getColorFromClinic(clinic), color: "#fff", padding: "15px 5px", textAlign: "center", fontSize: "1.5rem" }}>
                                 <Grid container direction="row"
                                     justify="center"
                                     alignItems="center"
                                     spacing={1}
                                 >
                                     <Grid item>
-                                        <EditIcon style={{ fontSize: "2rem" }} />
+                                        <Tooltip title="Change Clinic">
+                                            <EditIcon style={{ fontSize: "2rem", cursor:"pointer" }} onClick={editClinicClicked} />
+                                        </Tooltip>
                                     </Grid>
                                     <Grid item style={{ marginTop: "-10px" }}>
-                                        {props.clinic}
-
+                                        {clinic}
                                     </Grid>
                                 </Grid>
                             </div>
@@ -740,6 +807,23 @@ export default function EditOVBookingDialog(props) {
                                       </Button>
                                 </Grid>
 
+                                <Grid item xs={12}>
+                                    <div style={{width:"100%", display:"flex", justifyContent:"center"}}>
+                                    <Button
+                                        onClick={saveAsClicked}
+                                        variant="contained"
+                                        color="secondary"
+                                        style={{ width: "400px" }}
+                                        // style={{ backgroundColor: "#ff7200", color: "#fff" }}
+                                        disabled={saving}
+                                    >
+                                        Save As a new booking
+                                      </Button>
+
+                                    </div>
+                                </Grid>
+
+
                                 {/* <div style={{position:"absolute", left:"10px", bottom:"5px"}}> */}
                                 {/* </div> */}
 
@@ -788,6 +872,14 @@ export default function EditOVBookingDialog(props) {
 
                 </React.Fragment>
             )}
+
+            <ChooseClinicDialog
+                    open={openClinicDialog}
+                    handleClose={handleCloseClinicDialog}
+                    clinicClicked={handleClinicClicked}
+            />
+            
+            
         </React.Fragment>
     );
 }
