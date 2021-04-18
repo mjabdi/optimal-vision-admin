@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DataGrid } from '@material-ui/data-grid';
 import { Button, Checkbox, CircularProgress, Dialog, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, Grid, Icon, InputLabel, LinearProgress, Link, makeStyles, MenuItem, Paper, Select, SvgIcon, Switch, TextField, Tooltip } from '@material-ui/core';
 import RefreshIcon from '@material-ui/icons/Refresh';
@@ -7,7 +7,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import GlobalState from '../GlobalState';
 import { getMenuIndex } from '../MenuList';
-import {FormatDateFromString, FormatDateFromStringShortYear} from './DateFormatter';
+import { FormatDateFromString, FormatDateFromStringShortYear } from './DateFormatter';
 import AccessibilityIcon from '@material-ui/icons/Accessibility';
 
 import SearchIcon from '@material-ui/icons/Search';
@@ -55,16 +55,16 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1),
 
   },
-  
-  refreshButton:{
+
+  refreshButton: {
     marginLeft: theme.spacing(2),
   },
 
-  checkIcon:{
+  checkIcon: {
     color: "green"
   },
 
-  closeIcon:{
+  closeIcon: {
     color: "red"
   },
 
@@ -72,42 +72,42 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer"
   },
 
-  BookedLabel:{
+  BookedLabel: {
     backgroundColor: "#606060",
     color: "#fff",
     width: "70px",
     textAlign: "center",
   },
 
-  PatientAttendedLabel:{
+  PatientAttendedLabel: {
     backgroundColor: "#0066aa",
     color: "#fff",
     width: "70px",
     textAlign: "center",
   },
 
-  SampleTakenLabel:{
+  SampleTakenLabel: {
     backgroundColor: "#0066cc",
     color: "#fff",
     width: "70px",
     textAlign: "center",
   },
 
-  ReportSentLabel:{
+  ReportSentLabel: {
     backgroundColor: "#009900",
     color: "#fff",
     width: "70px",
     textAlign: "center",
   },
 
-  ReportCertSentLabel:{
+  ReportCertSentLabel: {
     backgroundColor: "#009900",
     color: "#fff",
     width: "70px",
     textAlign: "center",
   },
 
-  PositiveLabel:{
+  PositiveLabel: {
     backgroundColor: "red",
     color: "#fff",
     width: "70px",
@@ -120,8 +120,8 @@ const useStyles = makeStyles((theme) => ({
     left: "40%",
     width: "600px",
     height: "300px",
-    backgroundColor : "#fafafa",
-    color : "#111",
+    backgroundColor: "#fafafa",
+    color: "#111",
     zIndex: "1000",
     display: "flex",
     alignItems: "center",
@@ -131,38 +131,38 @@ const useStyles = makeStyles((theme) => ({
   ExportToExcelButton:
   {
     // marginBottom : "20px",
-    color : "#2f942e",
+    color: "#2f942e",
     borderColor: "#2f942e",
     "&:hover": {
       background: "#fafffa",
       borderColor: "#2f942e",
     },
-    textDecoration : "none !important", 
-   
+    textDecoration: "none !important",
+
   },
 
   ExportToExcelButtonInline:
   {
     // marginBottom : "20px",
-    color : "#2f942e",
+    color: "#2f942e",
     borderColor: "#2f942e",
     "&:hover": {
       background: "#fafffa",
       borderColor: "#2f942e",
     },
-    textDecoration : "none !important", 
+    textDecoration: "none !important",
     cursor: "pointer",
     padding: "10px"
-   
+
   },
 
   table: {
     width: "100%",
     border: "1px solid #ddd",
     borderCollapse: "collapse",
-},
+  },
 
-th: {
+  th: {
     border: "1px solid #ddd",
     borderCollapse: "collapse",
     verticalAlign: "middle",
@@ -173,102 +173,82 @@ th: {
     paddingBottom: "5px",
     width: "14%",
     paddingLeft: "5px",
-},
+  },
 
-td: {
+  td: {
     border: "1px solid #ddd",
     borderCollapse: "collapse",
     verticalAlign: "middle",
     paddingLeft: "5px",
-},
+  },
 
-topSelect: {
-  margin: theme.spacing(1),
-  minWidth: 80,
-},
+  topSelect: {
+    margin: theme.spacing(1),
+    minWidth: 80,
+  },
 
-notifyIcon:{
-  width: "16px",
-  height: "16px",
-  borderRadius: "50%",
-  backgroundColor : "rgb(220, 0, 78)",
-  marginLeft: "10px"
-}
+  notifyIcon: {
+    width: "16px",
+    height: "16px",
+    borderRadius: "50%",
+    backgroundColor: "rgb(220, 0, 78)",
+    marginLeft: "10px"
+  }
 
 }));
 
-const getTableTitle = (str) =>{
+const getTableTitle = (str) => {
 
-  if (str === 'today')
-  {
+  if (str === 'today') {
     return `Today's Bookings`;
-  }else if (str === 'old')
-  {
+  } else if (str === 'old') {
     return `Old Bookings`;
-  }else if (str === 'future')
-  {
+  } else if (str === 'future') {
     return `Future Bookings`;
-  }else if (str === 'recent')
-  {
+  } else if (str === 'recent') {
     return `Recent Bookings`;
-  }else if (str === 'live')
-  {
+  } else if (str === 'live') {
     return `Live Bookings`;
-  }else if (str === 'completed')
-  {
+  } else if (str === 'completed') {
     return `Completed Bookings`;
-  }else if (str === 'positive')
-  {
+  } else if (str === 'positive') {
     return `Positive Results`;
-  }else if (str === 'deleted')
-  {
+  } else if (str === 'deleted') {
     return `Archived Records`;
-  }else if (str === 'late')
-  {
+  } else if (str === 'late') {
     return `40 Hours Late`;
   }
-  
-  else
-  {
+
+  else {
     return `Patients`;
   }
 
 }
 
-const getTableIcon = (str) =>{
+const getTableIcon = (str) => {
 
-  if (str === 'today')
-  {
-    return <NewReleasesIcon style={{fontSize:"2.2rem"}} />;
-  }else if (str === 'old')
-  {
-    return <HistoryIcon style={{fontSize:"2.2rem"}} />;
-  }else if (str === 'future')
-  {
-    return <TimelineIcon style={{fontSize:"2.2rem"}} />;
-  }else if (str === 'recent')
-  {
-    return <AutorenewIcon style={{fontSize:"2.2rem"}} />;
-  }else if (str === 'live')
-  {
-    return <LiveTvIcon style={{fontSize:"2.2rem"}} />;
-  }else if (str === 'completed')
-  {
-    return  <PlaylistAddCheckIcon style={{fontSize:"2.2rem"}} />;
-  }else if (str === 'positive')
-  {
-    return <AddCircleOutlineIcon style={{fontSize:"2.2rem"}} />
-  }else if (str === 'deleted')
-  {
-    return <DeleteIcon style={{fontSize:"2.2rem"}} />;
-  }else if (str === 'late')
-  {
-    return <HourglassEmptyIcon style={{fontSize:"2.2rem"}} />;
+  if (str === 'today') {
+    return <NewReleasesIcon style={{ fontSize: "2.2rem" }} />;
+  } else if (str === 'old') {
+    return <HistoryIcon style={{ fontSize: "2.2rem" }} />;
+  } else if (str === 'future') {
+    return <TimelineIcon style={{ fontSize: "2.2rem" }} />;
+  } else if (str === 'recent') {
+    return <AutorenewIcon style={{ fontSize: "2.2rem" }} />;
+  } else if (str === 'live') {
+    return <LiveTvIcon style={{ fontSize: "2.2rem" }} />;
+  } else if (str === 'completed') {
+    return <PlaylistAddCheckIcon style={{ fontSize: "2.2rem" }} />;
+  } else if (str === 'positive') {
+    return <AddCircleOutlineIcon style={{ fontSize: "2.2rem" }} />
+  } else if (str === 'deleted') {
+    return <DeleteIcon style={{ fontSize: "2.2rem" }} />;
+  } else if (str === 'late') {
+    return <HourglassEmptyIcon style={{ fontSize: "2.2rem" }} />;
   }
-  
-  else
-  {
-    return <AccessibilityIcon style={{fontSize:"2.2rem"}} />;
+
+  else {
+    return <AccessibilityIcon style={{ fontSize: "2.2rem" }} />;
   }
 
 }
@@ -282,160 +262,58 @@ function PaperComponent(props) {
 }
 
 export default function PatientsTable(props) {
-  
+
   const classes = useStyles();
 
-  const [topCount, setTopCount] = React.useState(25)
-  const topCountChanged = (event) =>
-  {
-    // setTopCount(event.target.value)
-    // loadData(event.target.value)
-  }
-  
-
-  const [openDialogExcel, setOpenDialogExcel] = useState(false);
-  const handleCloseDialogExcel = () =>
-  {
-    setCorporate(corporates[0]);
-    setJustCorporate(false);
-    setOpenDialogExcel(false);
-  }
 
 
-  const [fromDate, setFromDate] = React.useState(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000 ));
-  const handleFromDateChange = (date) => {
-    setFromDate(date);
-    setFromDateStr(dateformat(date,'yyyy-mm-dd'));
-  };
+  var columns = [
+    {
+      field: "_id",
+      headerName: "Patient ID",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <React.Fragment>
+            <IconButton
+              color="primary"
+              onClick={(event) => openDetailsDialog(event, params.value)}
+            >
+              <SearchIcon />
+            </IconButton>
 
-  const [untilDate, setUntilDate] = React.useState(new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000 ));
-  const handleUntilDateChange = (date) => {
-    setUntilDate(date);
-    seUntilDateStr(dateformat(date,'yyyy-mm-dd'));
-  };
-
-  const [fromDateStr, setFromDateStr] = useState(dateformat(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000 ), 'yyyy-mm-dd'));
-  const [untilDateStr, seUntilDateStr] = useState(dateformat(new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000 ), 'yyyy-mm-dd'));
-
-  const [justCorporate, setJustCorporate] = useState(false);
-
-  const[chkDate, setChkDate] = useState(true);
-  const[chkForename, setChkForename] = useState(true);
-  const[chkSurname, setChkSurname] = useState(true);
-  const[chkDOB, setChkDOB] = useState(true);
-  const[chkEmail, setChkEmail] = useState(true);
-  const[chkTel, setChkTel] = useState(true);
-  const[chkCertificate, setChkCertidicate] = useState(true);
-  const[chkAntiBodyTest, setChkAntiBodyTest] = useState(true);
-  const[chkextRef, setChkExtRef] = useState(true);
-  const[chkPrice, setChkPrice] = useState(true);
-
-  const justCorporateChanged = (event) =>
-  {
-    setJustCorporate(event.target.checked);
-  }
-  
-
-  const chkDateChanged = (event) =>
-  {
-    setChkDate(event.target.checked);
-  }
-
-  const chkForenameChanged = (event) =>
-  {
-    setChkForename(event.target.checked);
-  }
-
-  const chkSurnameChanged = (event) =>
-  {
-    setChkSurname(event.target.checked);
-  }
-
-  const chkDOBChanged = (event) =>
-  {
-    setChkDOB(event.target.checked);
-  }
-
-  const chkEmailChanged = (event) =>
-  {
-    setChkEmail(event.target.checked);
-  }
-
-  const chkTelChanged = (event) =>
-  {
-    setChkTel(event.target.checked);
-  }
-
-  const chkCertificateChanged = (event) =>
-  {
-    setChkCertidicate(event.target.checked);
-  }
-
-  const chkAntiBodyTestChanged = (event) =>
-  {
-    setChkAntiBodyTest(event.target.checked);
-  }
-
-  const chkextRefChanged = (event) =>
-  {
-    setChkExtRef(event.target.checked);
-  }
-
-  const chkPriceChanged = (event) =>
-  {
-    setChkPrice(event.target.checked);
-  }
-
-
-
-
-    var columns = [
-      {
-        field: "_id",
-        headerName: " ",
-        width: 120,
-        renderCell: (params) => {
-          return (
-            <React.Fragment>
-              <IconButton
-                color="primary"
-                onClick={(event) => openDetailsDialog(event, params.value)}
-              >
-                <SearchIcon />
-              </IconButton>
-
-              <span
-                style={{
-                  color: "#058700",
-                  fontWeight: "500",
-                  fontSize: "0.8rem",
-                }}
-              >
-                {params.getValue("questions") && "Self-Test"}
-              </span>
-            </React.Fragment>
-          );
-        },
+            <span
+              style={{
+                color: "#333",
+                fontWeight: "600",
+                fontSize: "0.8rem",
+              }}
+            >
+              {params.getValue("patientID")}
+            </span>
+          </React.Fragment>
+        );
       },
-      { field: 'name', headerName: 'Name', width: 150 },
-      { field: 'surname', headerName: 'Surname', width: 150 },
-      {
-        field: 'birthDate', headerName: 'DOB', width: 150, valueFormatter: (params) => {
-          return FormatDateFromString(params.value);
-        },
+    },
+    { field: 'name', headerName: 'Name', width: 150 },
+    { field: 'surname', headerName: 'Surname', width: 150 },
+    {
+      field: 'birthDate', headerName: 'DOB', width: 150, valueFormatter: (params) => {
+        return FormatDateFromString(params.value);
       },
-      { field: 'email', headerName: 'Email', width: 200 },
-      { field: 'homeTel', headerName: 'Home Tel', width: 150 },
-      { field: 'mobileTel', headerName: 'Mobile Tel', width: 150 },
-      { field: 'postCode', headerName: 'Postcode', width: 300 },
-      { field: 'address', headerName: 'Address', width: 300 },
-    
-    ];
-  
+    },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'homeTel', headerName: 'Home Tel', width: 150 },
+    { field: 'mobileTel', headerName: 'Mobile Tel', width: 150 },
+    { field: 'postCode', headerName: 'Postcode', width: 300 },
+    { field: 'address', headerName: 'Address', width: 300 },
 
-  const [state, setState] = React.useContext(GlobalState);  
+  ];
 
-  const [data, setData] = React.useState({bookings: [] , cachedBookings: [], isFetching : true});
+
+  const [state, setState] = React.useContext(GlobalState);
+
+  const [data, setData] = React.useState({ bookings: [], cachedBookings: [], isFetching: true });
 
   const [selectedRow, setSelectedRow] = React.useState(null);
 
@@ -443,51 +321,44 @@ export default function PatientsTable(props) {
   const [seeDetailsDialogOpen, setSeeDetailsDialogOpen] = React.useState(false);
 
   const [corporate, setCorporate] = useState(corporates[0]);
-  const corporateChanged = (event) =>
-  {
+  const corporateChanged = (event) => {
     setCorporate(event.target.value);
   }
-  
 
-  const [filter,setFilter] = React.useState('');
+
+  const [filter, setFilter] = React.useState('');
 
 
   const lastPromise = useRef();
 
-  const formatTimeStamp = (timeStamp) =>
-  {
+  const formatTimeStamp = (timeStamp) => {
     const todayStr = dateformat(new Date(), 'yyyy-mm-dd');
     const timeStampStr = dateformat(timeStamp, 'yyyy-mm-dd');
-    if (todayStr === timeStampStr)
-    {
+    if (todayStr === timeStampStr) {
       return dateformat(timeStamp, "'Today', h:MM:ss TT");
     }
-    else
-    {
-       return dateformat(timeStamp, "mmm dS, h:MM:ss TT");
+    else {
+      return dateformat(timeStamp, "mmm dS, h:MM:ss TT");
     }
   }
 
-  const loadData = () =>
-  {
+  const loadData = () => {
     var api = PatientService.getAllPatients;
-    
-    if (props.date === 'deleted')
-    {
+
+    if (props.date === 'deleted') {
       api = PatientService.getDeletedPatients;
     }
-     
-    setData({bookings: [], cachedBookings: [], isFetching: true});
-   
+
+    setData({ bookings: [], cachedBookings: [], isFetching: true });
+
     // console.log(props)
 
-    const currentPromise = api().then( (res) =>{
+    const currentPromise = api().then((res) => {
       // console.log(res)
-      for (var i=0; i < res.data.length; i++)
-      {
-        res.data[i] = {...res.data[i], id : i + 1}
-      }  
-      setData({bookings: [...res.data], cachedBookings: [...res.data], isFetching: false});
+      for (var i = 0; i < res.data.length; i++) {
+        res.data[i] = { ...res.data[i], id: i + 1 }
+      }
+      setData({ bookings: [...res.data], cachedBookings: [...res.data], isFetching: false });
       // return res.data;
     }).catch(err => {
       console.error(err)
@@ -511,90 +382,78 @@ export default function PatientsTable(props) {
 
   }
 
-  useEffect( () => {
-            loadData()
-        },
-        [props.date]);
+  useEffect(() => {
+    loadData()
+  },
+    [props.date]);
 
 
 
 
-  useEffect( () => {
+  useEffect(() => {
 
-        if (filter && filter.trim().length > 0)
-        {
-          var filteredData = data.cachedBookings.filter( (element) => 
+    if (filter && filter.trim().length > 0) {
+      var filteredData = data.cachedBookings.filter((element) =>
 
-             (element.name?.toLowerCase().indexOf(filter.toLowerCase()) >= 0) ||
-             (element.surname?.toLowerCase().indexOf(filter.toLowerCase()) >= 0) ||
-             ((element.name + ' ' + element.surname)?.toLowerCase().indexOf(filter.toLowerCase()) >= 0)
-
-
-              
-          );
-  
-  
-          setData({bookings: [...filteredData], cachedBookings: data.cachedBookings, isFetching: false});
-        }else
-        {
-          setData({bookings: [...data.cachedBookings], cachedBookings: data.cachedBookings, isFetching: false});
-        }
-      },
-      [filter]);
-
-  
-      useEffect(() => {
-
-       loadData()
-    
-      }, [state.bookingDialogDataChanged]);    
+        (element.name?.toLowerCase().indexOf(filter.toLowerCase()) >= 0) ||
+        (element.surname?.toLowerCase().indexOf(filter.toLowerCase()) >= 0) ||
+        ((element.name + ' ' + element.surname)?.toLowerCase().indexOf(filter.toLowerCase()) >= 0)
 
 
-  const handleCloseSeeDetaisDialog = () =>
-  {
+
+      );
+
+
+      setData({ bookings: [...filteredData], cachedBookings: data.cachedBookings, isFetching: false });
+    } else {
+      setData({ bookings: [...data.cachedBookings], cachedBookings: data.cachedBookings, isFetching: false });
+    }
+  },
+    [filter]);
+
+
+  useEffect(() => {
+
+    loadData()
+
+  }, [state.patientDialogDataChanged]);
+
+
+  const handleCloseSeeDetaisDialog = () => {
     setSelectedBooking(null);
     setSeeDetailsDialogOpen(false);
-  }    
-  
-  const openDetailsDialog = (event, id) =>
-  {
-    const booking = data.bookings.find(element => element._id === id);
-    setSelectedBooking(booking);
-    setSeeDetailsDialogOpen(true);
-
   }
 
-  const refreshClicked = (event) =>{
+  const openDetailsDialog = (event, id) => {
+    const patient = data.bookings.find(element => element._id === id);
+    if (patient) {
+      setSelectedPatient(patient);
+      setPatientDialogTitle(`${patient.name.toUpperCase()} ${patient.surname.toUpperCase()}`)
+      setPatientDialogSaveButtonText("Save Changes")
+      setPatientDialogOpen(true)
+    }
+  }
+
+  const refreshClicked = (event) => {
     setFilter('');
     loadData()
   }
 
-  const filterChanged = (event) =>{
+  const filterChanged = (event) => {
     setFilter(event.target.value);
   }
 
-  const handleSelectionChanged = (newSelection) =>
-  {
-    if (newSelection.length > 0){
+  const handleSelectionChanged = (newSelection) => {
+    if (newSelection.length > 0) {
       setSelectedRow(newSelection.rows[0]);
     }
-    
+
   }
 
   const [page, setPage] = React.useState(1);
 
-  const handleExcelButtonClicked = (event) =>
-  {
-    setOpenDialogExcel(true);
-  }
 
-  const isTopSelectHidden = (date)=>
-  {
-    return true
-  }
-
-  const registerNewPatientClicked = () =>
-  {
+  const registerNewPatientClicked = () => {
     setSelectedPatient(null)
     setPatientDialogTitle('Register New Patient')
     setPatientDialogSaveButtonText("Save")
@@ -607,8 +466,7 @@ export default function PatientsTable(props) {
   const [patientDialogSaveButtonText, setPatientDialogSaveButtonText] = React.useState('')
 
 
-  const handleClosePatientDialog = () =>
-  {
+  const handleClosePatientDialog = () => {
     setPatientDialogOpen(false)
   }
 
@@ -668,19 +526,19 @@ export default function PatientsTable(props) {
         </Grid>
 
         <Grid item md={3}>
-            <div style={{ paddingBottom: "10px" }}>
-              <Button
-                // className={classes.ExportToExcelButton}
-                variant="contained"
-                color="primary"
-                onClick={registerNewPatientClicked}
-                startIcon={
-                  <AddIcon/>
-                }
-              >
-                Register new Patient
+          <div style={{ paddingBottom: "10px" }}>
+            <Button
+              // className={classes.ExportToExcelButton}
+              variant="contained"
+              color="primary"
+              onClick={registerNewPatientClicked}
+              startIcon={
+                <AddIcon />
+              }
+            >
+              Register new Patient
               </Button>
-            </div>
+          </div>
         </Grid>
 
         {data.isFetching && <div className={classes.HideNowRows}></div>}
@@ -722,13 +580,13 @@ export default function PatientsTable(props) {
       />
 
       <PatientDialog
-              patient={selectedPatient}
-              open={patientDialogOpen}
-              handleClose={handleClosePatientDialog}
-              title={patientDialogTitle}
-              saveButtonText={patientDialogSaveButtonText}
+        patient={selectedPatient}
+        open={patientDialogOpen}
+        handleClose={handleClosePatientDialog}
+        title={patientDialogTitle}
+        saveButtonText={patientDialogSaveButtonText}
       />
 
     </React.Fragment>
   );
-} 
+}
