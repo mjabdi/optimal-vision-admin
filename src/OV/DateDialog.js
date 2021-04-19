@@ -350,7 +350,7 @@ export default function DateDialog(props) {
                             </Grid>
 
                             <Grid item xs={4}>
-                                <div style={{ position: "relative", border: `1px solid ${'#ddd'}`, borderRadius: "10px", padding: "20px", paddingBottom: "50px", marginTop: "20px" }}>
+                                <div style={{ position: "relative", border: `1px solid ${'#ddd'}`, borderRadius: "10px", padding: "20px", paddingBottom: "20px", marginTop: "20px" }}>
 
                                     <div style={{ position: "absolute", top: "-15px", left: "15px", backgroundColor: "#fff", color: `${'#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
                                         Appointment Time
