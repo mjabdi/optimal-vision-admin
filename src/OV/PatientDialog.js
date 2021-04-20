@@ -1727,6 +1727,7 @@ export default function PatientDialog(props) {
                                                 setPatient({ ...patient, formData: { ...patient.formData, refractioncurrentpresdate: value } })
                                                 // setBirthDateError(false)
                                             }}
+                                            todayButton={true}
                                         />
                                 </Grid>
                                 <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>
@@ -1926,6 +1927,7 @@ export default function PatientDialog(props) {
                                                 setPatient({ ...patient, formData: { ...patient.formData, contactlensdate: value } })
                                                 // setBirthDateError(false)
                                             }}
+                                            todayButton={true}
                                         />
                                 </Grid>
                                 <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>

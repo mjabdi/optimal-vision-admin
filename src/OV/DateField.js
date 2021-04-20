@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const DateField = ({ title, value, dateChanged, error, children }) => {
+const DateField = ({ title, value, dateChanged, error, todayButton, children }) => {
 
     const [day, setDay] = React.useState('');
     const [month, setMonth] = React.useState('');
@@ -140,13 +140,16 @@ const DateField = ({ title, value, dateChanged, error, children }) => {
                     </Tooltip>
                 </div>
 
-                <div style={{ position: "absolute", top: "-25px", right: "70px", backgroundColor: "#fff", color: `${error ? 'red' : '#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
-                    <Tooltip title="Today">
-                        <IconButton onClick={todayDate}>
-                            <TodayIcon />
-                        </IconButton>
-                    </Tooltip>
-                </div>
+                {todayButton && (
+                    <div style={{ position: "absolute", top: "-25px", right: "70px", backgroundColor: "#fff", color: `${error ? 'red' : '#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
+                        <Tooltip title="Today">
+                            <IconButton onClick={todayDate}>
+                                <TodayIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+
+                )}
 
 
 
@@ -227,7 +230,7 @@ const DateField = ({ title, value, dateChanged, error, children }) => {
 
             </div>
 
-            
+
         </React.Fragment>
     );
 }
