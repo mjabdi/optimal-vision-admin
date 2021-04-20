@@ -132,7 +132,7 @@ const DateField = ({ title, value, dateChanged, error, children }) => {
                     {title}
                 </div>
 
-                <div style={{ position: "absolute", top: "-25px", right: "15px", backgroundColor: "#fff", color: `${error ? 'red' : '#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
+                <div style={{ position: "absolute", top: "-25px", right: "10px", backgroundColor: "#fff", color: `${error ? 'red' : '#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
                     <Tooltip title="Clear Date">
                         <IconButton onClick={resetDate}>
                             <CloseIcon />
@@ -140,7 +140,7 @@ const DateField = ({ title, value, dateChanged, error, children }) => {
                     </Tooltip>
                 </div>
 
-                <div style={{ position: "absolute", top: "-25px", right: "75px", backgroundColor: "#fff", color: `${error ? 'red' : '#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
+                <div style={{ position: "absolute", top: "-25px", right: "70px", backgroundColor: "#fff", color: `${error ? 'red' : '#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
                     <Tooltip title="Today">
                         <IconButton onClick={todayDate}>
                             <TodayIcon />

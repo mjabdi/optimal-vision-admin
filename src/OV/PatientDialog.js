@@ -2119,12 +2119,6 @@ export default function PatientDialog(props) {
                                 </Grid>
 
                                 <Grid item xs={12} style={{marginBottom:"20px"}}></Grid>
-
-
-
-
-
-
                             </Grid>            
                         </TabPanel>
                         <TabPanel value={value} index={7}>
