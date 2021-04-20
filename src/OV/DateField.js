@@ -13,7 +13,7 @@ import dateformat from 'dateformat';
 import { FormControl, IconButton, InputLabel, Select, Tooltip } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import CloseIcon from '@material-ui/icons/Close';
-
+import TodayIcon from '@material-ui/icons/Today';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const DateField = ({ title, value, dateChanged, error }) => {
+const DateField = ({ title, value, dateChanged, error, children }) => {
 
     const [day, setDay] = React.useState('');
     const [month, setMonth] = React.useState('');
@@ -74,6 +74,12 @@ const DateField = ({ title, value, dateChanged, error }) => {
         setMonth("")
         dateChanged("")
     }
+
+    const todayDate = () => {
+        const today = new Date()
+        updateDate(today.getDate(), today.getMonth(), today.getFullYear())
+    }
+
 
     useEffect(() => {
         if (value && value.length === 10) {
@@ -133,6 +139,15 @@ const DateField = ({ title, value, dateChanged, error }) => {
                         </IconButton>
                     </Tooltip>
                 </div>
+
+                <div style={{ position: "absolute", top: "-25px", right: "75px", backgroundColor: "#fff", color: `${error ? 'red' : '#555'}`, padding: "5px", paddingLeft: "10px", paddingRight: "10px" }}>
+                    <Tooltip title="Today">
+                        <IconButton onClick={todayDate}>
+                            <TodayIcon />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+
 
 
 
@@ -206,7 +221,13 @@ const DateField = ({ title, value, dateChanged, error }) => {
                     </Grid>
                 </Grid>
 
+                <div>
+                    {children}
+                </div>
+
             </div>
+
+            
         </React.Fragment>
     );
 }
