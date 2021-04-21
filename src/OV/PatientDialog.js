@@ -113,22 +113,22 @@ const useStyles = makeStyles((theme) => ({
         color: "#fff",
     },
 
-    titleCenter:{
-        width:"100%",
-        textAlign:"center",
-        fontSize:"1.1rem",
-        color:theme.palette.primary.main,
-        fontWeight:"500",
+    titleCenter: {
+        width: "100%",
+        textAlign: "center",
+        fontSize: "1.1rem",
+        color: theme.palette.primary.main,
+        fontWeight: "500",
         borderBottom: `2px dashed ${theme.palette.primary.main}`
     },
 
-    eyeText:{
-        width:"100%",
-        textAlign:"left",
-        fontSize:"1.1rem",
-        color:theme.palette.primary.main,
-        fontWeight:"500",
-        paddingTop:"15px"
+    eyeText: {
+        width: "100%",
+        textAlign: "left",
+        fontSize: "1.1rem",
+        color: theme.palette.primary.main,
+        fontWeight: "500",
+        paddingTop: "15px"
     }
 
 }));
@@ -238,8 +238,7 @@ export default function PatientDialog(props) {
             setSurnameError(true)
         }
 
-        if (patient.birthDate &&  patient.birthDate.length !== 10)
-        {
+        if (patient.birthDate && patient.birthDate.length !== 10) {
             setBirthDateError(true)
             error = true
         }
@@ -353,7 +352,7 @@ export default function PatientDialog(props) {
                                             labelId="gender-label"
                                             id="gender-label"
                                             fullWidth
-                                            style={{height:"90px"}}
+                                            style={{ height: "90px" }}
                                             value={patient.gender}
                                             onChange={(event) => {
                                                 setPatient({ ...patient, gender: event.target.value })
@@ -365,7 +364,7 @@ export default function PatientDialog(props) {
                                         </Select>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} sm={6} md={8} style={{marginTop:"-20px"}} >
+                                <Grid item xs={12} sm={6} md={8} style={{ marginTop: "-20px" }} >
                                     <DateField
                                         error={birthDateError}
                                         value={patient.birthDate}
@@ -735,91 +734,91 @@ export default function PatientDialog(props) {
                             </Grid>
                         </TabPanel>
                         <TabPanel value={value} index={2}>
-                        <Grid container spacing={4}>
+                            <Grid container spacing={4}>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                            name="dryevehistory"
-                                            id="dryevehistory"
-                                            label="Dry Eye History"
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            autoComplete="none"
-                                            value={patient.formData.dryeyehistory}
-                                            onChange={(event) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, dryeyehistory: event.target.value } })
-                                            }}
+                                        name="dryevehistory"
+                                        id="dryevehistory"
+                                        label="Dry Eye History"
+                                        fullWidth
+                                        multiline
+                                        rows={3}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.dryeyehistory}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, dryeyehistory: event.target.value } })
+                                        }}
 
-                                        />
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                            name="nightvisionglare"
-                                            id="nightvisionglare"
-                                            label="Night Vision / Glare"
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            autoComplete="none"
-                                            value={patient.formData.nightvisionglare}
-                                            onChange={(event) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, nightvisionglare: event.target.value } })
-                                            }}
+                                        name="nightvisionglare"
+                                        id="nightvisionglare"
+                                        label="Night Vision / Glare"
+                                        fullWidth
+                                        multiline
+                                        rows={3}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.nightvisionglare}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, nightvisionglare: event.target.value } })
+                                        }}
 
-                                        />
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                            name="ocularirritation"
-                                            id="ocularirritation"
-                                            label="Ocular Irritation"
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            autoComplete="none"
-                                            value={patient.formData.ocularirritation}
-                                            onChange={(event) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, ocularirritation: event.target.value } })
-                                            }}
+                                        name="ocularirritation"
+                                        id="ocularirritation"
+                                        label="Ocular Irritation"
+                                        fullWidth
+                                        multiline
+                                        rows={3}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.ocularirritation}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, ocularirritation: event.target.value } })
+                                        }}
 
-                                        />
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                            name="wateryeyes"
-                                            id="wateryeyes"
-                                            label="Watery Eyes"
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            autoComplete="none"
-                                            value={patient.formData.wateryeyes}
-                                            onChange={(event) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, wateryeyes: event.target.value } })
-                                            }}
+                                        name="wateryeyes"
+                                        id="wateryeyes"
+                                        label="Watery Eyes"
+                                        fullWidth
+                                        multiline
+                                        rows={3}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.wateryeyes}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, wateryeyes: event.target.value } })
+                                        }}
 
-                                        />
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                            name="speedquestionariedone"
-                                            id="speedquestionariedone"
-                                            label="SPEED Questionnaire Done"
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            autoComplete="none"
-                                            value={patient.formData.speedquestionariedone}
-                                            onChange={(event) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, speedquestionariedone: event.target.value } })
-                                            }}
+                                        name="speedquestionariedone"
+                                        id="speedquestionariedone"
+                                        label="SPEED Questionnaire Done"
+                                        fullWidth
+                                        multiline
+                                        rows={3}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.speedquestionariedone}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, speedquestionariedone: event.target.value } })
+                                        }}
 
-                                        />
+                                    />
                                 </Grid>
                             </Grid>
                         </TabPanel>
@@ -827,7 +826,7 @@ export default function PatientDialog(props) {
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <div className={classes.titleCenter}>
-                                            ANTERIOR SEGMENT
+                                        ANTERIOR SEGMENT
                                     </div>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
@@ -882,7 +881,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="lidslashesleft"
                                         id="lidslashesleft"
                                         label={`Lids & Lashes (Left Eye)`}
@@ -916,7 +915,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="conjunctivaleft"
                                         id="conjunctivaleft"
                                         label={`Conjunctiva (Left Eye)`}
@@ -951,20 +950,20 @@ export default function PatientDialog(props) {
                                 </Grid>
                                 <Grid item xs={12} md={6}>
                                     <TextField
-                                            name="pupilleft"
-                                            id="pupilleft"
-                                            label={`Pupil/PERRLA/RPAD/SIZE (Left Eye)`}
-                                            fullWidth
-                                            multiline
-                                            rows={3}
-                                            variant="outlined"
-                                            autoComplete="none"
-                                            value={patient.formData.pupilleft}
-                                            onChange={(event) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, pupilleft: event.target.value } })
-                                            }}
+                                        name="pupilleft"
+                                        id="pupilleft"
+                                        label={`Pupil/PERRLA/RPAD/SIZE (Left Eye)`}
+                                        fullWidth
+                                        multiline
+                                        rows={3}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.pupilleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, pupilleft: event.target.value } })
+                                        }}
 
-                                        />
+                                    />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
                                     <TextField
@@ -984,7 +983,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="acleft"
                                         id="acleft"
                                         label={`A.C. (Left Eye)`}
@@ -1018,7 +1017,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="lensleft"
                                         id="lensleft"
                                         label={`Lens (Left Eye)`}
@@ -1052,7 +1051,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="vitreousleft"
                                         id="vitreousleft"
                                         label={`Vitreous (Left Eye)`}
@@ -1086,7 +1085,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="ombleft"
                                         id="ombleft"
                                         label={`OMB (Left Eye)`}
@@ -1120,7 +1119,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="ombleft"
                                         id="ombleft"
                                         label={`OMB (Left Eye)`}
@@ -1137,9 +1136,9 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
 
-                                <Grid item xs={12} style={{margingTop:"10px"}}>
+                                <Grid item xs={12} style={{ margingTop: "10px" }}>
                                     <div className={classes.titleCenter}>
-                                            POSTERIOR SEGMENT
+                                        POSTERIOR SEGMENT
                                     </div>
                                 </Grid>
 
@@ -1161,7 +1160,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="discleft"
                                         id="discleft"
                                         label={`DISC (Left Eye)`}
@@ -1196,7 +1195,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="cdleft"
                                         id="cdleft"
                                         label={`C:D (Left Eye)`}
@@ -1231,7 +1230,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="bloodvesselsleft"
                                         id="bloodvesselsleft"
                                         label={`Blood Vessels (Left Eye)`}
@@ -1265,7 +1264,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="maculaleft"
                                         id="maculaleft"
                                         label={`Macula (Left Eye)`}
@@ -1299,7 +1298,7 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                <TextField
+                                    <TextField
                                         name="peripheryleft"
                                         id="peripheryleft"
                                         label={`Periphery (Left Eye)`}
@@ -1319,7 +1318,7 @@ export default function PatientDialog(props) {
 
                         </TabPanel>
                         <TabPanel value={value} index={4}>
-                        <Grid container spacing={2}>
+                            <Grid container spacing={2}>
                                 <Grid item xs={12} md={6}>
                                     <TextField
                                         name="pupillowlightdiamright"
@@ -1562,7 +1561,7 @@ export default function PatientDialog(props) {
 
                         </TabPanel>
                         <TabPanel value={value} index={5}>
-                        <Grid container spacing={2}>
+                            <Grid container spacing={2}>
                                 <Grid item xs={12} md={4}>
                                     <TextField
                                         name="distancevaright"
@@ -1715,20 +1714,20 @@ export default function PatientDialog(props) {
 
                             </Grid>
 
-                          </TabPanel>
+                        </TabPanel>
                         <TabPanel value={value} index={6}>
-                        <Grid container spacing={2}>
+                            <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <DateField
-                                            // error={birthDateError}
-                                            title="Current Prescription Date"
-                                            value={patient.formData.refractioncurrentpresdate}    
-                                            dateChanged={(value) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, refractioncurrentpresdate: value } })
-                                                // setBirthDateError(false)
-                                            }}
-                                            todayButton={true}
-                                        />
+                                        // error={birthDateError}
+                                        title="Current Prescription Date"
+                                        value={patient.formData.refractioncurrentpresdate}
+                                        dateChanged={(value) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, refractioncurrentpresdate: value } })
+                                            // setBirthDateError(false)
+                                        }}
+                                        todayButton={true}
+                                    />
                                 </Grid>
                                 <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>
                                 <Grid item xs={12} md={2}>
@@ -1900,13 +1899,13 @@ export default function PatientDialog(props) {
                                             label="Spec Type"
                                             labelId="spectype-label"
                                             id="spectype-label"
-                                            style={{textAlign:"center"}}
+                                            style={{ textAlign: "center" }}
                                             fullWidth
                                             value={patient.formData.refractionsepctype}
                                             onChange={(event) => {
                                                 setPatient({ ...patient, formData: { ...patient.formData, refractionsepctype: event.target.value } })
                                             }}
-    
+
                                         >
                                             <MenuItem value={"Single Vision"}>Single Vision</MenuItem>
                                             <MenuItem value={"Bifocal"}>Bifocal</MenuItem>
@@ -1920,15 +1919,15 @@ export default function PatientDialog(props) {
 
                                 <Grid item xs={12}>
                                     <DateField
-                                            // error={birthDateError}
-                                            title="Contact Lens Date"
-                                            value={patient.formData.contactlensdate}    
-                                            dateChanged={(value) => {
-                                                setPatient({ ...patient, formData: { ...patient.formData, contactlensdate: value } })
-                                                // setBirthDateError(false)
-                                            }}
-                                            todayButton={true}
-                                        />
+                                        // error={birthDateError}
+                                        title="Contact Lens Date"
+                                        value={patient.formData.contactlensdate}
+                                        dateChanged={(value) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, contactlensdate: value } })
+                                            // setBirthDateError(false)
+                                        }}
+                                        todayButton={true}
+                                    />
                                 </Grid>
                                 <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>
                                 <Grid item xs={12} md={2}>
@@ -2094,9 +2093,6 @@ export default function PatientDialog(props) {
                                     />
                                 </Grid>
 
-
-
-
                                 <Grid item xs={12}>
                                     <FormControl fullWidth variant="outlined" >
                                         <InputLabel id="cltype-label">CL Type</InputLabel>
@@ -2104,13 +2100,13 @@ export default function PatientDialog(props) {
                                             label="CL Type"
                                             labelId="cltype-label"
                                             id="cltype-label"
-                                            style={{textAlign:"center"}}
+                                            style={{ textAlign: "center" }}
                                             fullWidth
                                             value={patient.formData.refractioncltype}
                                             onChange={(event) => {
                                                 setPatient({ ...patient, formData: { ...patient.formData, refractioncltype: event.target.value } })
                                             }}
-    
+
                                         >
                                             <MenuItem value={"Dailies Soft"}>Dailies Soft</MenuItem>
                                             <MenuItem value={"Monthlies"}>Monthlies</MenuItem>
@@ -2120,20 +2116,624 @@ export default function PatientDialog(props) {
                                     </FormControl>
                                 </Grid>
 
-                                <Grid item xs={12} style={{marginBottom:"20px"}}></Grid>
-                            </Grid>            
+                                <Grid item xs={12} style={{ marginBottom: "20px" }}></Grid>
+                            </Grid>
                         </TabPanel>
                         <TabPanel value={value} index={7}>
-                            Item Seven
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="sphereautorefright"
+                                        id="sphereautorefright"
+                                        label="Sphere (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.sphereautorefright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, sphereautorefright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cylautorefright"
+                                        id="cylautorefright"
+                                        label="Cyl (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cylautorefright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cylautorefright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axisautorefright"
+                                        id="axisautorefright"
+                                        label="Axis (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axisautorefright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axisautorefright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="vaautorefright"
+                                        id="vaautorefright"
+                                        label="VA (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.vaautorefright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, vaautorefright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}></Grid>
+
+
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Left Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="sphereautorefleft"
+                                        id="sphereautorefleft"
+                                        label="Sphere (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.sphereautorefleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, sphereautorefleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cylautorefleft"
+                                        id="cylautorefleft"
+                                        label="Cyl (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cylautorefleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cylautorefleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axisautorefleft"
+                                        id="axisautorefleft"
+                                        label="Axis (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axisautorefleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axisautorefleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="vaautorefleft"
+                                        id="vaautorefleft"
+                                        label="VA (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.vaautorefleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, vaautorefleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
                         </TabPanel>
                         <TabPanel value={value} index={8}>
-                            Item Seven
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <div className={classes.titleCenter}>
+                                        Manifest Refraction
+                                    </div>
+                                </Grid>
+
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="spheremanifestright"
+                                        id="spheremanifestright"
+                                        label="Sphere (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.spheremanifestright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, spheremanifestright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cylmanifestright"
+                                        id="cylmanifestright"
+                                        label="Cyl (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cylmanifestright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cylmanifestright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axismanifestright"
+                                        id="axismanifestright"
+                                        label="Axis (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axismanifestright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axismanifestright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="addmanifestright"
+                                        id="addmanifestright"
+                                        label="Add (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.addmanifestright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, addmanifestright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="vamanifestright"
+                                        id="vamanifestright"
+                                        label="VA (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.vamanifestright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, vamanifestright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Left Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="spheremanifestleft"
+                                        id="spheremanifestleft"
+                                        label="Sphere (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.spheremanifestleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, spheremanifestleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cylmanifestleft"
+                                        id="cylmanifestleft"
+                                        label="Cyl (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cylmanifestleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cylmanifestleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axismanifestleft"
+                                        id="axismanifestleft"
+                                        label="Axis (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axismanifestleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axismanifestleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="addmanifestleft"
+                                        id="addmanifestleft"
+                                        label="Add (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.addmanifestleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, addmanifestleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="vamanifestleft"
+                                        id="vamanifestleft"
+                                        label="VA (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.vamanifestleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, vamanifestleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} style={{ marginTop: "50px" }}>
+                                    <div className={classes.titleCenter}>
+                                        Cycloplegic Refraction
+                                    </div>
+                                </Grid>
+
+
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="spherecycloright"
+                                        id="spherecycloright"
+                                        label="Sphere (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.spherecycloright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, spherecycloright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cylcycloright"
+                                        id="cylcycloright"
+                                        label="Cyl (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cylcycloright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cylcycloright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axiscycloright"
+                                        id="axiscycloright"
+                                        label="Axis (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axiscycloright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axiscycloright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="addcycloright"
+                                        id="addcycloright"
+                                        label="Add (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.addcycloright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, addcycloright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="vacycloright"
+                                        id="vacycloright"
+                                        label="VA (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.vacycloright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, vacycloright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Left Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="spherecycloleft"
+                                        id="spherecycloleft"
+                                        label="Sphere (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.spherecycloleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, spherecycloleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cylcycloleft"
+                                        id="cylcycloleft"
+                                        label="Cyl (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cylcycloleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cylcycloleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axiscycloleft"
+                                        id="axiscycloleft"
+                                        label="Axis (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axiscycloleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axiscycloleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="addcycloleft"
+                                        id="addcycloleft"
+                                        label="Add (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.addcycloleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, addcycloleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="vacycloleft"
+                                        id="vacycloleft"
+                                        label="VA (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.vacycloleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, vacycloleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+
+
+                            </Grid>
                         </TabPanel>
                         <TabPanel value={value} index={9}>
-                            Item Seven
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Right Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="spheretargetrefright"
+                                        id="spheretargetrefright"
+                                        label="Sphere (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.spheretargetrefright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, spheretargetrefright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cyltargetrefright"
+                                        id="cyltargetrefright"
+                                        label="Cyl (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cyltargetrefright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cyltargetrefright: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axistargetrefright"
+                                        id="axistargetrefright"
+                                        label="Axis (RE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axistargetrefright}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axistargetrefright: event.target.value } })
+                                        }}
+                                    />
+
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                </Grid>
+                                <Grid item xs={12} md={2}></Grid>
+
+
+                                <Grid item xs={12} md={2}> <div className={classes.eyeText}>Left Eye : </div></Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="spheretargetrefleft"
+                                        id="spheretargetrefleft"
+                                        label="Sphere (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.spheretargetrefleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, spheretargetrefleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="cyltargetrefleft"
+                                        id="cyltargetrefleft"
+                                        label="Cyl (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.cyltargetrefleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, cyltargetrefleft: event.target.value } })
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <TextField
+                                        name="axistargetrefleft"
+                                        id="axistargetrefleft"
+                                        label="Axis (LE)"
+                                        fullWidth
+                                        multiline
+                                        rows={1}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.axistargetrefleft}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, axistargetrefleft: event.target.value } })
+                                        }}
+                                    />
+
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                </Grid>
+                            </Grid>
+
                         </TabPanel>
                         <TabPanel value={value} index={10}>
-                            Item Seven
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                <TextField
+                                        name="recommendation"
+                                        id="recommendation"
+                                        label="Recommendation"
+                                        fullWidth
+                                        multiline
+                                        rows={15}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.recommendation}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, recommendation: event.target.value } })
+                                        }}
+                                    />
+
+                                </Grid>
+                            </Grid>
                         </TabPanel>
 
 
