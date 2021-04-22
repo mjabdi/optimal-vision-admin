@@ -53,6 +53,9 @@ import Tab from '@material-ui/core/Tab';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 import PatientService from "./services/PatientService";
+import dateFormat from "dateformat";
+
+import SaveIcon from '@material-ui/icons/Save';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -156,18 +159,33 @@ export default function PatientDialog(props) {
 
     const [value, setValue] = React.useState(0);
 
+    const [history, setHistory] = React.useState([]);
+    const [backupFormData, setBackUpFormData] = React.useState(null);
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
 
     useEffect(() => {
         if (props.open) {
+            const _history = []
+
             if (props.patient) {
                 setPatient({ ...props.patient, formData: props.patient.formData ? JSON.parse(props.patient.formData) : {} })
+                setBackUpFormData(props.patient.formData ? JSON.parse(props.patient.formData) : {})
+                if (props.patient.history) {
+                    props.patient.history.forEach(record => {
+                        _history.push(JSON.parse(record))
+                    });
+                    setSelectedVersion(0)
+                }
             }
             else {
                 setPatient({ formData: {} })
             }
+
+            setHistory(_history.reverse())
+
         }
     }, [props.patient, props.open])
 
@@ -247,12 +265,55 @@ export default function PatientDialog(props) {
 
     }
 
+    const formatDate = (date) => {
+        return dateFormat(date, "dd-mm-yyyy , HH:MM:ss")
+    }
+
+    const [selectedVersion, setSelectedVersion] = React.useState(0)
+
+    const showHistoryComboBox = () => {
+        return (
+            <React.Fragment>
+                <div style={{marginTop:"-10px"}}>
+                    <span style={{ color: "#fff", fontWeight: "500", fontSize: "1rem", marginRight: "10px" }}>
+                        Version :
+                    </span>
+                    <Select
+                        label="Version"
+                        labelId="version-label"
+                        id="version-label"
+                        style={{ color: "#fff", padding: "0px 10px" }}
+                        value={selectedVersion}
+                        onChange={(event) => {
+                            setSelectedVersion(event.target.value)
+                            if (event.target.value === 0) {
+                                setPatient({ ...patient, formData: backupFormData })
+                            } else {
+                                setPatient({ ...patient, formData: history[event.target.value - 1] })
+                            }
+
+                        }}
+
+                    >
+                        <MenuItem value={0}>{`${formatDate(patient.formData.timeStamp)} (Current)`}</MenuItem>
+
+                        {history.map((item, index) => (
+                            <MenuItem value={index + 1}>{formatDate(item.timeStamp)}</MenuItem>
+                        ))
+                        }
+                    </Select>
+
+                </div>
+            </React.Fragment>
+        )
+    }
+
 
     return (
         <React.Fragment>
             <React.Fragment>
                 <Dialog fullScreen open={props.open} onClose={handleClose} TransitionComponent={Transition}>
-                    <AppBar className={classes.appBar} color="secondary">
+                    <AppBar className={classes.appBar} style={(selectedVersion > 0 && history && history.length > 0) ? {backgroundColor:"#777"} : {}} color="secondary">
                         <Toolbar>
                             <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
                                 <CloseIcon />
@@ -260,10 +321,22 @@ export default function PatientDialog(props) {
                             <Typography variant="h6" className={classes.title}>
                                 {props.title}
                             </Typography>
-                            <Button color="inherit" onClick={saveClicked}>
+
+
+                            <Button startIcon={<SaveIcon/>} variant="contained" color="primary" onClick={saveClicked} disabled={selectedVersion > 0 && history && history.length > 0}>
                                 {props.saveButtonText}
                             </Button>
                         </Toolbar>
+
+                        <Grid container direction="column" alignItems="center" justify="center">
+
+                            {history && history.length > 0 && (
+                                <Grid item>
+                                    {showHistoryComboBox()}
+                                </Grid>
+                            )}
+                        </Grid>
+
                     </AppBar>
 
                     <div className={classes.root}>
@@ -301,7 +374,7 @@ export default function PatientDialog(props) {
                                         required
                                         helperText={patientRepeated ? 'This PatientID is already assigned to another patient' : ''}
                                         error={patientIDError}
-                                        value={patient.patientID}
+                                        value={patient.patientID || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, patientID: event.target.value })
                                             setPatientIDError(false)
@@ -318,7 +391,7 @@ export default function PatientDialog(props) {
                                         fullWidth
                                         required
                                         error={nameError}
-                                        value={patient.name}
+                                        value={patient.name || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, name: event.target.value })
                                             setNameError(false)
@@ -335,7 +408,7 @@ export default function PatientDialog(props) {
                                         fullWidth
                                         required
                                         error={surnameError}
-                                        value={patient.surname}
+                                        value={patient.surname || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, surname: event.target.value })
                                             setSurnameError(false)
@@ -353,7 +426,7 @@ export default function PatientDialog(props) {
                                             id="gender-label"
                                             fullWidth
                                             style={{ height: "90px" }}
-                                            value={patient.gender}
+                                            value={patient.gender || ''}
                                             onChange={(event) => {
                                                 setPatient({ ...patient, gender: event.target.value })
                                             }}
@@ -367,7 +440,7 @@ export default function PatientDialog(props) {
                                 <Grid item xs={12} sm={6} md={8} style={{ marginTop: "-20px" }} >
                                     <DateField
                                         error={birthDateError}
-                                        value={patient.birthDate}
+                                        value={patient.birthDate || ''}
                                         title="DOB"
                                         dateChanged={(value) => {
                                             setPatient({ ...patient, birthDate: value })
@@ -382,7 +455,7 @@ export default function PatientDialog(props) {
                                         label="Postcode"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.postCode}
+                                        value={patient.postCode || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, postCode: event.target.value })
                                         }}
@@ -397,7 +470,7 @@ export default function PatientDialog(props) {
                                         label="Address"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.address}
+                                        value={patient.address || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, address: event.target.value })
                                         }}
@@ -414,7 +487,7 @@ export default function PatientDialog(props) {
                                         label="Home Tel"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.homeTel}
+                                        value={patient.homeTel || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, homeTel: event.target.value })
                                         }}
@@ -430,7 +503,7 @@ export default function PatientDialog(props) {
                                         label="Mobile Tel"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.mobileTel}
+                                        value={patient.mobileTel || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, mobileTel: event.target.value })
                                         }}
@@ -446,7 +519,7 @@ export default function PatientDialog(props) {
                                         label="Email"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.email}
+                                        value={patient.email || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, email: event.target.value })
                                         }}
@@ -462,7 +535,7 @@ export default function PatientDialog(props) {
                                         label="Occupation"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.formData.occupation}
+                                        value={patient.formData.occupation || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, occupation: event.target.value } })
                                         }}
@@ -478,7 +551,7 @@ export default function PatientDialog(props) {
                                         label={`GP Name & Address`}
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.formData.gpname}
+                                        value={patient.formData.gpname || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, gpname: event.target.value } })
                                         }}
@@ -494,7 +567,7 @@ export default function PatientDialog(props) {
                                         label="Next of Kin Contact"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.formData.kincontact}
+                                        value={patient.formData.kincontact || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, kincontact: event.target.value } })
                                         }}
@@ -509,7 +582,7 @@ export default function PatientDialog(props) {
                                         label="Previous Sight Test"
                                         fullWidth
                                         autoComplete="none"
-                                        value={patient.formData.prevsighttest}
+                                        value={patient.formData.prevsighttest || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, prevsighttest: event.target.value } })
                                         }}
@@ -531,7 +604,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cc}
+                                        value={patient.formData.cc || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cc: event.target.value } })
                                         }}
@@ -548,7 +621,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.prevmedicalhistory}
+                                        value={patient.formData.prevmedicalhistory || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, prevmedicalhistory: event.target.value } })
                                         }}
@@ -565,7 +638,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.prevocularhistory}
+                                        value={patient.formData.prevocularhistory || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, prevocularhistory: event.target.value } })
                                         }}
@@ -583,7 +656,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.familyhistory}
+                                        value={patient.formData.familyhistory || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, familyhistory: event.target.value } })
                                         }}
@@ -600,7 +673,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.medications}
+                                        value={patient.formData.medications || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, medications: event.target.value } })
                                         }}
@@ -618,7 +691,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.grafth}
+                                        value={patient.formData.grafth || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, grafth: event.target.value } })
                                         }}
@@ -636,7 +709,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.allergies}
+                                        value={patient.formData.allergies || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, allergies: event.target.value } })
                                         }}
@@ -654,7 +727,7 @@ export default function PatientDialog(props) {
                                         variant="outlined"
                                         autoComplete="none"
                                         placeholder={` Yes/No \n Soft/RGP/EW`}
-                                        value={patient.formData.contactlenswearer}
+                                        value={patient.formData.contactlenswearer || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, contactlenswearer: event.target.value } })
                                         }}
@@ -671,7 +744,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.hobbies}
+                                        value={patient.formData.hobbies || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, hobbies: event.target.value } })
                                         }}
@@ -689,7 +762,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vdu}
+                                        value={patient.formData.vdu || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vdu: event.target.value } })
                                         }}
@@ -706,7 +779,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.driver}
+                                        value={patient.formData.driver || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, driver: event.target.value } })
                                         }}
@@ -724,7 +797,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.othernotes}
+                                        value={patient.formData.othernotes || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, othernotes: event.target.value } })
                                         }}
@@ -745,7 +818,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.dryeyehistory}
+                                        value={patient.formData.dryeyehistory || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, dryeyehistory: event.target.value } })
                                         }}
@@ -762,7 +835,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.nightvisionglare}
+                                        value={patient.formData.nightvisionglare || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, nightvisionglare: event.target.value } })
                                         }}
@@ -779,7 +852,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.ocularirritation}
+                                        value={patient.formData.ocularirritation || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, ocularirritation: event.target.value } })
                                         }}
@@ -796,7 +869,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.wateryeyes}
+                                        value={patient.formData.wateryeyes || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, wateryeyes: event.target.value } })
                                         }}
@@ -813,7 +886,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.speedquestionariedone}
+                                        value={patient.formData.speedquestionariedone || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, speedquestionariedone: event.target.value } })
                                         }}
@@ -825,7 +898,7 @@ export default function PatientDialog(props) {
                         <TabPanel value={value} index={3}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <div className={classes.titleCenter}>
+                                    <div className={classes.titleCenter || ''}>
                                         ANTERIOR SEGMENT
                                     </div>
                                 </Grid>
@@ -839,7 +912,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cornearight}
+                                        value={patient.formData.cornearight || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cornearight: event.target.value } })
                                         }}
@@ -856,7 +929,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cornealeft}
+                                        value={patient.formData.cornealeft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cornealeft: event.target.value } })
                                         }}
@@ -873,7 +946,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.lidslashesright}
+                                        value={patient.formData.lidslashesright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, lidslashesright: event.target.value } })
                                         }}
@@ -890,7 +963,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.lidslashesleft}
+                                        value={patient.formData.lidslashesleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, lidslashesleft: event.target.value } })
                                         }}
@@ -907,7 +980,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.conjunctivaright}
+                                        value={patient.formData.conjunctivaright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, conjunctivaright: event.target.value } })
                                         }}
@@ -924,7 +997,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.conjunctivaleft}
+                                        value={patient.formData.conjunctivaleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, conjunctivaleft: event.target.value } })
                                         }}
@@ -941,7 +1014,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pupilright}
+                                        value={patient.formData.pupilright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pupilright: event.target.value } })
                                         }}
@@ -958,7 +1031,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pupilleft}
+                                        value={patient.formData.pupilleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pupilleft: event.target.value } })
                                         }}
@@ -975,7 +1048,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.acright}
+                                        value={patient.formData.acright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, acright: event.target.value } })
                                         }}
@@ -992,7 +1065,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.acleft}
+                                        value={patient.formData.acleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, acleft: event.target.value } })
                                         }}
@@ -1009,7 +1082,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.lensright}
+                                        value={patient.formData.lensright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, lensright: event.target.value } })
                                         }}
@@ -1026,7 +1099,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.lensleft}
+                                        value={patient.formData.lensleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, lensleft: event.target.value } })
                                         }}
@@ -1043,7 +1116,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vitreousright}
+                                        value={patient.formData.vitreousright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vitreousright: event.target.value } })
                                         }}
@@ -1060,7 +1133,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vitreousleft}
+                                        value={patient.formData.vitreousleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vitreousleft: event.target.value } })
                                         }}
@@ -1077,7 +1150,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.ombright}
+                                        value={patient.formData.ombright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, ombright: event.target.value } })
                                         }}
@@ -1094,7 +1167,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.ombleft}
+                                        value={patient.formData.ombleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, ombleft: event.target.value } })
                                         }}
@@ -1111,7 +1184,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.tbutright}
+                                        value={patient.formData.tbutright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, tbutright: event.target.value } })
                                         }}
@@ -1128,7 +1201,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.ombleft}
+                                        value={patient.formData.ombleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, ombleft: event.target.value } })
                                         }}
@@ -1152,7 +1225,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.discright}
+                                        value={patient.formData.discright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, discright: event.target.value } })
                                         }}
@@ -1169,7 +1242,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.discleft}
+                                        value={patient.formData.discleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, discleft: event.target.value } })
                                         }}
@@ -1187,7 +1260,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cdright}
+                                        value={patient.formData.cdright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cdright: event.target.value } })
                                         }}
@@ -1204,7 +1277,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cdleft}
+                                        value={patient.formData.cdleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cdleft: event.target.value } })
                                         }}
@@ -1222,7 +1295,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.bloodvesselsright}
+                                        value={patient.formData.bloodvesselsright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, bloodvesselsright: event.target.value } })
                                         }}
@@ -1239,7 +1312,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.bloodvesselsleft}
+                                        value={patient.formData.bloodvesselsleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, bloodvesselsleft: event.target.value } })
                                         }}
@@ -1256,7 +1329,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.macularight}
+                                        value={patient.formData.macularight || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, macularight: event.target.value } })
                                         }}
@@ -1273,7 +1346,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.maculaleft}
+                                        value={patient.formData.maculaleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, maculaleft: event.target.value } })
                                         }}
@@ -1290,7 +1363,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.peripheryright}
+                                        value={patient.formData.peripheryright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, peripheryright: event.target.value } })
                                         }}
@@ -1307,7 +1380,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.peripheryleft}
+                                        value={patient.formData.peripheryleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, peripheryleft: event.target.value } })
                                         }}
@@ -1329,7 +1402,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pupillowlightdiamright}
+                                        value={patient.formData.pupillowlightdiamright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pupillowlightdiamright: event.target.value } })
                                         }}
@@ -1346,7 +1419,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pupillowlightdiamleft}
+                                        value={patient.formData.pupillowlightdiamleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pupillowlightdiamleft: event.target.value } })
                                         }}
@@ -1363,7 +1436,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pachmetryright}
+                                        value={patient.formData.pachmetryright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pachmetryright: event.target.value } })
                                         }}
@@ -1380,7 +1453,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pachmetryleft}
+                                        value={patient.formData.pachmetryleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pachmetryleft: event.target.value } })
                                         }}
@@ -1397,7 +1470,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.keratometryright}
+                                        value={patient.formData.keratometryright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, keratometryright: event.target.value } })
                                         }}
@@ -1414,7 +1487,7 @@ export default function PatientDialog(props) {
                                         rows={3}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.keratometryleft}
+                                        value={patient.formData.keratometryleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, keratometryleft: event.target.value } })
                                         }}
@@ -1431,7 +1504,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.acdepthright}
+                                        value={patient.formData.acdepthright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, acdepthright: event.target.value } })
                                         }}
@@ -1448,7 +1521,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.acdepthleft}
+                                        value={patient.formData.acdepthleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, acdepthleft: event.target.value } })
                                         }}
@@ -1465,7 +1538,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.maculathicnessright}
+                                        value={patient.formData.maculathicnessright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, maculathicnessright: event.target.value } })
                                         }}
@@ -1482,7 +1555,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.maculathicnessleft}
+                                        value={patient.formData.maculathicnessleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, maculathicnessleft: event.target.value } })
                                         }}
@@ -1499,7 +1572,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.octcommentright}
+                                        value={patient.formData.octcommentright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, octcommentright: event.target.value } })
                                         }}
@@ -1516,7 +1589,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.octcommentleft}
+                                        value={patient.formData.octcommentleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, octcommentleft: event.target.value } })
                                         }}
@@ -1533,7 +1606,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pentacamcommentright}
+                                        value={patient.formData.pentacamcommentright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pentacamcommentright: event.target.value } })
                                         }}
@@ -1550,7 +1623,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.pentacamcommentleft}
+                                        value={patient.formData.pentacamcommentleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, pentacamcommentleft: event.target.value } })
                                         }}
@@ -1572,7 +1645,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.distancevaright}
+                                        value={patient.formData.distancevaright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, distancevaright: event.target.value } })
                                         }}
@@ -1589,7 +1662,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.distancevaleft}
+                                        value={patient.formData.distancevaleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, distancevaleft: event.target.value } })
                                         }}
@@ -1605,7 +1678,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.distancevabinocular}
+                                        value={patient.formData.distancevabinocular || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, distancevabinocular: event.target.value } })
                                         }}
@@ -1621,7 +1694,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.intermediatevaright}
+                                        value={patient.formData.intermediatevaright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, intermediatevaright: event.target.value } })
                                         }}
@@ -1638,7 +1711,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.intermediatevaleft}
+                                        value={patient.formData.intermediatevaleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, intermediatevaleft: event.target.value } })
                                         }}
@@ -1654,7 +1727,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.intermediatevabinocular}
+                                        value={patient.formData.intermediatevabinocular || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, intermediatevabinocular: event.target.value } })
                                         }}
@@ -1670,7 +1743,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.nearvaright}
+                                        value={patient.formData.nearvaright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, nearvaright: event.target.value } })
                                         }}
@@ -1687,7 +1760,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.nearvaleft}
+                                        value={patient.formData.nearvaleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, nearvaleft: event.target.value } })
                                         }}
@@ -1703,7 +1776,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.nearvabinocular}
+                                        value={patient.formData.nearvabinocular || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, nearvabinocular: event.target.value } })
                                         }}
@@ -1721,7 +1794,7 @@ export default function PatientDialog(props) {
                                     <DateField
                                         // error={birthDateError}
                                         title="Current Prescription Date"
-                                        value={patient.formData.refractioncurrentpresdate}
+                                        value={patient.formData.refractioncurrentpresdate || ''}
                                         dateChanged={(value) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, refractioncurrentpresdate: value } })
                                             // setBirthDateError(false)
@@ -1740,7 +1813,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spherepresdateright}
+                                        value={patient.formData.spherepresdateright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spherepresdateright: event.target.value } })
                                         }}
@@ -1756,7 +1829,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylpresdateright}
+                                        value={patient.formData.cylpresdateright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylpresdateright: event.target.value } })
                                         }}
@@ -1772,7 +1845,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axispresdateright}
+                                        value={patient.formData.axispresdateright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axispresdateright: event.target.value } })
                                         }}
@@ -1788,7 +1861,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addpresdateright}
+                                        value={patient.formData.addpresdateright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addpresdateright: event.target.value } })
                                         }}
@@ -1804,7 +1877,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vapresdateright}
+                                        value={patient.formData.vapresdateright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vapresdateright: event.target.value } })
                                         }}
@@ -1822,7 +1895,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spherepresdateleft}
+                                        value={patient.formData.spherepresdateleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spherepresdateleft: event.target.value } })
                                         }}
@@ -1838,7 +1911,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylpresdateleft}
+                                        value={patient.formData.cylpresdateleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylpresdateleft: event.target.value } })
                                         }}
@@ -1854,7 +1927,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axispresdateleft}
+                                        value={patient.formData.axispresdateleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axispresdateleft: event.target.value } })
                                         }}
@@ -1870,7 +1943,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addpresdateleft}
+                                        value={patient.formData.addpresdateleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addpresdateleft: event.target.value } })
                                         }}
@@ -1886,7 +1959,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vapresdateleft}
+                                        value={patient.formData.vapresdateleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vapresdateleft: event.target.value } })
                                         }}
@@ -1901,7 +1974,7 @@ export default function PatientDialog(props) {
                                             id="spectype-label"
                                             style={{ textAlign: "center" }}
                                             fullWidth
-                                            value={patient.formData.refractionsepctype}
+                                            value={patient.formData.refractionsepctype || ''}
                                             onChange={(event) => {
                                                 setPatient({ ...patient, formData: { ...patient.formData, refractionsepctype: event.target.value } })
                                             }}
@@ -1921,7 +1994,7 @@ export default function PatientDialog(props) {
                                     <DateField
                                         // error={birthDateError}
                                         title="Contact Lens Date"
-                                        value={patient.formData.contactlensdate}
+                                        value={patient.formData.contactlensdate || ''}
                                         dateChanged={(value) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, contactlensdate: value } })
                                             // setBirthDateError(false)
@@ -1940,7 +2013,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spherepresdaterightlens}
+                                        value={patient.formData.spherepresdaterightlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spherepresdaterightlens: event.target.value } })
                                         }}
@@ -1956,7 +2029,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylpresdaterightlens}
+                                        value={patient.formData.cylpresdaterightlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylpresdaterightlens: event.target.value } })
                                         }}
@@ -1972,7 +2045,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axispresdaterightlens}
+                                        value={patient.formData.axispresdaterightlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axispresdaterightlens: event.target.value } })
                                         }}
@@ -1988,7 +2061,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addpresdaterightlens}
+                                        value={patient.formData.addpresdaterightlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addpresdaterightlens: event.target.value } })
                                         }}
@@ -2004,7 +2077,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vapresdaterightlens}
+                                        value={patient.formData.vapresdaterightlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vapresdaterightlens: event.target.value } })
                                         }}
@@ -2022,7 +2095,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spherepresdateleftlens}
+                                        value={patient.formData.spherepresdateleftlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spherepresdateleftlens: event.target.value } })
                                         }}
@@ -2038,7 +2111,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylpresdateleftlens}
+                                        value={patient.formData.cylpresdateleftlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylpresdateleftlens: event.target.value } })
                                         }}
@@ -2054,7 +2127,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axispresdateleftlens}
+                                        value={patient.formData.axispresdateleftlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axispresdateleftlens: event.target.value } })
                                         }}
@@ -2070,7 +2143,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addpresdateleftlens}
+                                        value={patient.formData.addpresdateleftlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addpresdateleftlens: event.target.value } })
                                         }}
@@ -2086,7 +2159,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vapresdateleftlens}
+                                        value={patient.formData.vapresdateleftlens || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vapresdateleftlens: event.target.value } })
                                         }}
@@ -2102,7 +2175,7 @@ export default function PatientDialog(props) {
                                             id="cltype-label"
                                             style={{ textAlign: "center" }}
                                             fullWidth
-                                            value={patient.formData.refractioncltype}
+                                            value={patient.formData.refractioncltype || ''}
                                             onChange={(event) => {
                                                 setPatient({ ...patient, formData: { ...patient.formData, refractioncltype: event.target.value } })
                                             }}
@@ -2132,7 +2205,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.sphereautorefright}
+                                        value={patient.formData.sphereautorefright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, sphereautorefright: event.target.value } })
                                         }}
@@ -2148,7 +2221,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylautorefright}
+                                        value={patient.formData.cylautorefright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylautorefright: event.target.value } })
                                         }}
@@ -2164,7 +2237,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axisautorefright}
+                                        value={patient.formData.axisautorefright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axisautorefright: event.target.value } })
                                         }}
@@ -2180,7 +2253,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vaautorefright}
+                                        value={patient.formData.vaautorefright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vaautorefright: event.target.value } })
                                         }}
@@ -2200,7 +2273,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.sphereautorefleft}
+                                        value={patient.formData.sphereautorefleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, sphereautorefleft: event.target.value } })
                                         }}
@@ -2216,7 +2289,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylautorefleft}
+                                        value={patient.formData.cylautorefleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylautorefleft: event.target.value } })
                                         }}
@@ -2232,7 +2305,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axisautorefleft}
+                                        value={patient.formData.axisautorefleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axisautorefleft: event.target.value } })
                                         }}
@@ -2248,7 +2321,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vaautorefleft}
+                                        value={patient.formData.vaautorefleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vaautorefleft: event.target.value } })
                                         }}
@@ -2275,7 +2348,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spheremanifestright}
+                                        value={patient.formData.spheremanifestright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spheremanifestright: event.target.value } })
                                         }}
@@ -2291,7 +2364,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylmanifestright}
+                                        value={patient.formData.cylmanifestright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylmanifestright: event.target.value } })
                                         }}
@@ -2307,7 +2380,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axismanifestright}
+                                        value={patient.formData.axismanifestright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axismanifestright: event.target.value } })
                                         }}
@@ -2323,7 +2396,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addmanifestright}
+                                        value={patient.formData.addmanifestright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addmanifestright: event.target.value } })
                                         }}
@@ -2339,7 +2412,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vamanifestright}
+                                        value={patient.formData.vamanifestright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vamanifestright: event.target.value } })
                                         }}
@@ -2357,7 +2430,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spheremanifestleft}
+                                        value={patient.formData.spheremanifestleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spheremanifestleft: event.target.value } })
                                         }}
@@ -2373,7 +2446,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylmanifestleft}
+                                        value={patient.formData.cylmanifestleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylmanifestleft: event.target.value } })
                                         }}
@@ -2389,7 +2462,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axismanifestleft}
+                                        value={patient.formData.axismanifestleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axismanifestleft: event.target.value } })
                                         }}
@@ -2405,7 +2478,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addmanifestleft}
+                                        value={patient.formData.addmanifestleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addmanifestleft: event.target.value } })
                                         }}
@@ -2421,7 +2494,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vamanifestleft}
+                                        value={patient.formData.vamanifestleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vamanifestleft: event.target.value } })
                                         }}
@@ -2446,7 +2519,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spherecycloright}
+                                        value={patient.formData.spherecycloright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spherecycloright: event.target.value } })
                                         }}
@@ -2462,7 +2535,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylcycloright}
+                                        value={patient.formData.cylcycloright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylcycloright: event.target.value } })
                                         }}
@@ -2478,7 +2551,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axiscycloright}
+                                        value={patient.formData.axiscycloright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axiscycloright: event.target.value } })
                                         }}
@@ -2494,7 +2567,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addcycloright}
+                                        value={patient.formData.addcycloright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addcycloright: event.target.value } })
                                         }}
@@ -2510,7 +2583,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vacycloright}
+                                        value={patient.formData.vacycloright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vacycloright: event.target.value } })
                                         }}
@@ -2528,7 +2601,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spherecycloleft}
+                                        value={patient.formData.spherecycloleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spherecycloleft: event.target.value } })
                                         }}
@@ -2544,7 +2617,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cylcycloleft}
+                                        value={patient.formData.cylcycloleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cylcycloleft: event.target.value } })
                                         }}
@@ -2560,7 +2633,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axiscycloleft}
+                                        value={patient.formData.axiscycloleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axiscycloleft: event.target.value } })
                                         }}
@@ -2576,7 +2649,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.addcycloleft}
+                                        value={patient.formData.addcycloleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, addcycloleft: event.target.value } })
                                         }}
@@ -2592,7 +2665,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.vacycloleft}
+                                        value={patient.formData.vacycloleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, vacycloleft: event.target.value } })
                                         }}
@@ -2615,7 +2688,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spheretargetrefright}
+                                        value={patient.formData.spheretargetrefright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spheretargetrefright: event.target.value } })
                                         }}
@@ -2631,7 +2704,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cyltargetrefright}
+                                        value={patient.formData.cyltargetrefright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cyltargetrefright: event.target.value } })
                                         }}
@@ -2647,7 +2720,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axistargetrefright}
+                                        value={patient.formData.axistargetrefright || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axistargetrefright: event.target.value } })
                                         }}
@@ -2670,7 +2743,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.spheretargetrefleft}
+                                        value={patient.formData.spheretargetrefleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, spheretargetrefleft: event.target.value } })
                                         }}
@@ -2686,7 +2759,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.cyltargetrefleft}
+                                        value={patient.formData.cyltargetrefleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, cyltargetrefleft: event.target.value } })
                                         }}
@@ -2702,7 +2775,7 @@ export default function PatientDialog(props) {
                                         rows={1}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.axistargetrefleft}
+                                        value={patient.formData.axistargetrefleft || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, axistargetrefleft: event.target.value } })
                                         }}
@@ -2717,7 +2790,7 @@ export default function PatientDialog(props) {
                         <TabPanel value={value} index={10}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                <TextField
+                                    <TextField
                                         name="recommendation"
                                         id="recommendation"
                                         label="Recommendation"
@@ -2726,7 +2799,7 @@ export default function PatientDialog(props) {
                                         rows={15}
                                         variant="outlined"
                                         autoComplete="none"
-                                        value={patient.formData.recommendation}
+                                        value={patient.formData.recommendation || ''}
                                         onChange={(event) => {
                                             setPatient({ ...patient, formData: { ...patient.formData, recommendation: event.target.value } })
                                         }}
