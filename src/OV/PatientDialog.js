@@ -192,14 +192,13 @@ export default function PatientDialog(props) {
 
 
     const handleClose = () => {
-
+        props.handleClose();
         setValue(0)
         setPatient({ formData: {} })
         setPatientIDError(false)
         setNameError(false)
         setSurnameError(false)
         setPatientRepeated(false)
-        props.handleClose();
     };
 
     const saveClicked = async () => {
@@ -295,10 +294,10 @@ export default function PatientDialog(props) {
                         }}
 
                     >
-                        <MenuItem value={0}>{`${formatDate(patient.formData.timeStamp)} (Current)`}</MenuItem>
+                        <MenuItem value={0}>{`${formatDate(patient.formData.timeStamp)} ( Current )`}</MenuItem>
 
                         {history.map((item, index) => (
-                            <MenuItem value={index + 1}>{formatDate(item.timeStamp)}</MenuItem>
+                            <MenuItem value={index + 1}>{`${formatDate(item.timeStamp)} ( History )`}</MenuItem>
                         ))
                         }
                     </Select>
