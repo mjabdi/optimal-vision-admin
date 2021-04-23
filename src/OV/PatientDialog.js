@@ -8,6 +8,7 @@ import {
     Checkbox,
     CircularProgress,
     DialogActions,
+    DialogContentText,
     Divider,
     FormControlLabel,
     Grid,
@@ -162,6 +163,13 @@ export default function PatientDialog(props) {
     const [history, setHistory] = React.useState([]);
     const [backupFormData, setBackUpFormData] = React.useState(null);
 
+    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
+
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false)
+    }
+
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -239,6 +247,30 @@ export default function PatientDialog(props) {
         }
     }
 
+    const deleteClicked = async () => {
+
+        setOpenDeleteDialog(false)
+
+        setSaving(true)
+        try {
+            await PatientService.deletePatient(props.patient._id)
+            setSaving(false)
+            setState((state) => ({
+                ...state,
+                patientDialogDataChanged: !state.patientDialogDataChanged
+                    ? true
+                    : false,
+            }));
+            handleClose();
+        }
+        catch (err) {
+            console.error(err)
+            setSaving(false)
+        }
+    }
+
+
+
     const validatePatient = () => {
         var error = false
         if (!patient.patientID || patient.patientID.trim().length === 0) {
@@ -273,7 +305,7 @@ export default function PatientDialog(props) {
     const showHistoryComboBox = () => {
         return (
             <React.Fragment>
-                <div style={{marginTop:"-10px"}}>
+                <div style={{ marginTop: "-10px" }}>
                     <span style={{ color: "#fff", fontWeight: "500", fontSize: "1rem", marginRight: "10px" }}>
                         Version :
                     </span>
@@ -312,7 +344,7 @@ export default function PatientDialog(props) {
         <React.Fragment>
             <React.Fragment>
                 <Dialog fullScreen open={props.open} onClose={handleClose} TransitionComponent={Transition}>
-                    <AppBar className={classes.appBar} style={(selectedVersion > 0 && history && history.length > 0) ? {backgroundColor:"#777"} : {}} color="secondary">
+                    <AppBar className={classes.appBar} style={(selectedVersion > 0 && history && history.length > 0) ? { backgroundColor: "#777" } : {}} color="secondary">
                         <Toolbar>
                             <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
                                 <CloseIcon />
@@ -322,7 +354,7 @@ export default function PatientDialog(props) {
                             </Typography>
 
 
-                            <Button startIcon={<SaveIcon/>} variant="contained" color="primary" onClick={saveClicked} disabled={selectedVersion > 0 && history && history.length > 0}>
+                            <Button startIcon={<SaveIcon />} variant="contained" color="primary" onClick={saveClicked} disabled={selectedVersion > 0 && history && history.length > 0}>
                                 {props.saveButtonText}
                             </Button>
                         </Toolbar>
@@ -589,6 +621,24 @@ export default function PatientDialog(props) {
 
                                     />
                                 </Grid>
+
+                                {props.patient && (
+                                    <Grid item xs={12} style={{ marginTop: "20px" }}>
+                                        <Button
+                                            onClick={() => setOpenDeleteDialog(true)}
+                                            variant="contained"
+                                            fullWidth
+                                            color="primary"
+                                            // style={{ width: "100px" }}
+                                            style={{ backgroundColor: "#c70000", color: "#fff" }}
+                                            disabled={saving}
+                                        >
+                                            Delete This Patient
+                                  </Button>
+                                    </Grid>
+
+
+                                )}
                             </Grid>
                         </TabPanel>
                         <TabPanel value={value} index={1}>
@@ -2817,6 +2867,35 @@ export default function PatientDialog(props) {
                     >
                         <CircularProgress color="inherit" />
                     </Backdrop>
+
+
+                    <Dialog
+                        open={openDeleteDialog}
+                        onClose={handleCloseDeleteDialog}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle style={{ color: "#d10202", fontWeight: "600" }} id="alert-dialog-title">
+                            {"Delete Patient"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText
+                                style={{ color: "#000", fontWeight: "500" }}
+                                id="alert-dialog-description"
+                            >
+                                Are you sure you want to delete this patient?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseDeleteDialog} color="default">
+                                Back
+                                 </Button>
+                            <Button onClick={deleteClicked} variant="contained" style={{ backgroundColor: "#d10202", color: "#fff" }}>
+                                Yes, Delete this patient
+                                 </Button>
+                        </DialogActions>
+                    </Dialog>
+
 
 
                 </Dialog>

@@ -847,7 +847,7 @@ export default function EditOVBookingDialog(props) {
                                     id="alert-dialog-description"
                                 >
                                     Are you sure you want to delete this appointment?
-              </DialogContentText>
+                            </DialogContentText>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={handleCloseDeleteDialog} color="default">
