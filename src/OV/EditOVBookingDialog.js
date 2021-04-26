@@ -365,7 +365,7 @@ export default function EditOVBookingDialog(props) {
 
 
     React.useEffect(() => {
-        if (props.booking) {
+        if (props.booking && props.open) {
             setFullname(props.booking.fullname)
             setPhone(props.booking.phone)
             setEmail(props.booking.email)
