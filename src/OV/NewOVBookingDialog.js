@@ -377,7 +377,7 @@ export default function NewOVBookingDialog(props) {
             loadPatiens()
         }
 
-    }, [props.open])
+    }, [props.open, state.patientDialogDataChanged])
 
     const loadPatiens = async() =>
     {
@@ -512,8 +512,15 @@ export default function NewOVBookingDialog(props) {
               setPatientID(patientRecord.patientID || '')
               setEmail(patientRecord.email || '')
               setPhone(patientRecord.mobileTel || patientRecord.homeTel || '')
-              setBirthDate(patientRecord.birthDate || '')
-          }
+              setBirthDate(patientRecord.birthDate || null)
+          }else
+          {
+            setFullname('')
+            setPatientID('')
+            setEmail('')
+            setPhone('')
+            setBirthDate(null)
+        }
 
       }, [patientRecord])
     

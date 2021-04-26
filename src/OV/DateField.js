@@ -90,6 +90,9 @@ const DateField = ({ title, value, dateChanged, error, todayButton, children }) 
             setDay(d);
             setMonth(m - 1);
             setYear(y);
+        }else if (!value)
+        {
+            resetDate()
         }
 
 
