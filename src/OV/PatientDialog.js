@@ -189,7 +189,7 @@ export default function PatientDialog(props) {
                 }
             }
             else {
-                setPatient({ formData: {} })
+                setPatient({ formData: {},  name : props.name || '', surname: props.surname || ''})
             }
 
             setHistory(_history.reverse())

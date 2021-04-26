@@ -29,6 +29,7 @@
     "file-saver": "^2.0.5",
     "js-cookie": "^2.2.1",
     "jss-rtl": "^0.3.0",
+    "match-sorter": "^6.3.0",
     "moment": "^2.29.1",
     "node-calendar": "^0.1.5",
     "prop-types": "^15.7.2",

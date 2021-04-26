@@ -51,6 +51,15 @@ import DateRangeIcon from "@material-ui/icons/DateRange";
 import { CalendarColors } from "./calendar-admin/colors";
 import DateField from "./DateField";
 
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import PatientService from "./services/PatientService";
+
+import {matchSorter} from 'match-sorter'
+import PatientDialog from "./PatientDialog";
+
+
+const filter = createFilterOptions();
+
 var interval;
 
 const useStyles = makeStyles((theme) => ({
@@ -308,6 +317,10 @@ export default function NewOVBookingDialog(props) {
     const [fullname, setFullname] = React.useState("");
     const [fullnameError, setFullnameError] = React.useState(false);
 
+    const [patientRecord, setPatientRecord] = React.useState(null)
+    const [patientList, setPatientList] = React.useState([])
+
+
     const [phone, setPhone] = React.useState("");
     const [email, setEmail] = React.useState("");
     const [notes, setNotes] = React.useState("");
@@ -358,6 +371,24 @@ export default function NewOVBookingDialog(props) {
         setPrescriptionRight(event.target.value);
     };
 
+    useEffect(() => {
+        if (props.open)
+        {
+            loadPatiens()
+        }
+
+    }, [props.open])
+
+    const loadPatiens = async() =>
+    {
+        try{
+            const res = await PatientService.getAllPatients()
+            setPatientList(res.data)
+        }catch(err)
+        {
+            console.error(err)
+        }
+    }
 
     const handleClose = () => {
         if (saving) return;
@@ -372,6 +403,7 @@ export default function NewOVBookingDialog(props) {
         setPatientID("")
         setPrescriptionLeft("")
         setPrescriptionRight("")
+        setPatientRecord(null)
 
         props.handleClose();
         setSaving(false);
@@ -384,8 +416,7 @@ export default function NewOVBookingDialog(props) {
             error = true;
         }
 
-        if (birthDate && birthDate.length >= 1 && birthDate.length < 10)
-        {
+        if (birthDate && birthDate.length >= 1 && birthDate.length < 10) {
             setBirthDateError(true);
             error = true;
         }
@@ -442,12 +473,50 @@ export default function NewOVBookingDialog(props) {
                 return CalendarColors.POSTOP_COLOR
             case "Optometry":
                 return CalendarColors.OPOTOMETRY_COLOR
-           
+
             default:
                 return "#777"
 
         }
     }
+
+    const filterOptions = (options, { inputValue }) => {
+
+        if (inputValue && inputValue.length >= 1)
+        {
+        //   setNoOptionsText("")
+          return matchSorter(options, inputValue, {keys: ['fullname']});
+        }
+        else
+        {
+        //   setNoOptionsText("Please enter at least 3 characters")
+          return matchSorter(options, '$$$$', {keys: ['fullname']});
+        }
+      }
+
+      const [patientDialogOpen, setPatientDialogOpen] = React.useState(false)
+      const handleClosePatientDialog = () =>
+      {
+          setPatientDialogOpen(false)
+          setNewName('')
+          setNewSurname('')
+      }
+
+      const [newName, setNewName] = React.useState('')
+      const [newSurname, setNewSurname] = React.useState('')
+
+      useEffect ( () => {
+          if (patientRecord)
+          {
+              setFullname(patientRecord.fullname || '')
+              setPatientID(patientRecord.patientID || '')
+              setEmail(patientRecord.email || '')
+              setPhone(patientRecord.mobileTel || patientRecord.homeTel || '')
+              setBirthDate(patientRecord.birthDate || '')
+          }
+
+      }, [patientRecord])
+    
 
     return (
         <React.Fragment>
@@ -494,7 +563,7 @@ export default function NewOVBookingDialog(props) {
                                     spacing={2}
                                     alignItems="center"
                                 >
-                                    <Grid item xs={12} style={{marginTop:"10px"}}> 
+                                    <Grid item xs={12} style={{ marginTop: "10px" }}>
                                         <Grid
                                             container
                                             direction="row"
@@ -514,7 +583,7 @@ export default function NewOVBookingDialog(props) {
                                     </Grid>
 
                                     <Grid item xs={12} md={6}>
-                                        <TextField
+                                        {/* <TextField
                                             fullWidth
                                             autoFocus
                                             error={fullnameError}
@@ -525,6 +594,90 @@ export default function NewOVBookingDialog(props) {
                                             name="fullname"
                                             id="fullname-id"
                                             autoComplete="none"
+                                        /> */}
+
+                                        <Autocomplete
+                                            fullWidth
+                                            autoComplete="none"
+                                            value={patientRecord}
+                                            onChange={(event, newValue) => {
+                                                if (typeof newValue === 'string') {
+                                                    // timeout to avoid instant validation of the dialog's form.
+                                                    setTimeout(() => {
+                                                        const _nameArray = newValue.split(" ")
+                                                        console.log(_nameArray)
+                                                        if (_nameArray.length >= 1)
+                                                        {
+                                                            setNewName(_nameArray[0])
+                                                        }
+                                                        if (_nameArray.length >=2 )
+                                                        {
+                                                            setNewSurname(_nameArray[1])
+                                                        }
+                                                        setPatientDialogOpen(true)
+                                                        // toggleOpen(true);
+                                                        // setDialogValue({
+                                                        //     title: newValue,
+                                                        //     year: '',
+                                                        // });
+                                                    });
+                                                } else if (newValue && newValue.inputValue) {
+                                                    const _nameArray = newValue.inputValue.split(" ")
+                                                    console.log(_nameArray)
+
+                                                    if (_nameArray.length >= 1)
+                                                    {
+                                                        setNewName(_nameArray[0])
+                                                    }
+                                                    if (_nameArray.length >= 2 )
+                                                    {
+                                                        setNewSurname(_nameArray[1])
+                                                    }
+
+                                                    setPatientDialogOpen(true)
+                                                    // toggleOpen(true);
+                                                    // setDialogValue({
+                                                    //     title: newValue.inputValue,
+                                                    //     year: '',
+                                                    // });
+                                                } else {
+                                                    setPatientRecord(newValue);
+                                                }
+                                            }}
+                                            filterOptions={(options, params) => {
+                                                // const filtered = filter(options, params);
+                                                const filtered = filterOptions(options,params)
+
+                                                if (params.inputValue !== '') {
+                                                    filtered.push({
+                                                        inputValue: params.inputValue,
+                                                        fullname: `Add "${params.inputValue}"`,
+                                                    });
+                                                }
+
+                                                return filtered;
+                                            }}
+                                            id="fullname"
+                                            options={patientList}
+                                            getOptionLabel={(option) => {
+                                                // e.g value selected with enter, right from the input
+                                                if (typeof option === 'string') {
+                                                    return option;
+                                                }
+                                                if (option.inputValue) {
+                                                    return option.inputValue;
+                                                }
+                                                return option.fullname;
+                                            }}
+                                            selectOnFocus
+                                            clearOnBlur
+                                            handleHomeEndKeys
+                                            renderOption={(option) => option.fullname}
+                                            // style={{ width: 300 }}
+                                            freeSolo
+                                            renderInput={(params) => (
+                                                <TextField {...params} onBlur={(event) => {setPatientRecord({...patientRecord, fullname:event.target.value})}} autoComplete="none" autoFocus error={fullnameError} fullWidth label="Full Name" required />
+                                            )}
                                         />
                                     </Grid>
 
@@ -653,12 +806,25 @@ export default function NewOVBookingDialog(props) {
                                         // style={{ width: "100px" }}
                                         disabled={saving}
                                     >
-                                       Book Appointment
+                                        Book Appointment
                       </Button>
                                 </Grid>
                             </Grid>
 
                         </DialogActions>
+
+
+                        <PatientDialog
+                            patient={null}
+                            open={patientDialogOpen}
+                            handleClose={handleClosePatientDialog}
+                            title={"Add New Patient"}
+                            saveButtonText={"Save"}
+                            name={newName}
+                            surname={newSurname}
+                        />
+
+
                     </Dialog>
                 </React.Fragment>
             )}
