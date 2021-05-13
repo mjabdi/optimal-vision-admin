@@ -45,6 +45,8 @@ import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 import PriceCalculator from './PriceCalculator';
 import { corporates } from './Corporates';
 
+import CallIcon from '@material-ui/icons/Call';
+
 const useStyles = makeStyles((theme) => ({
   title: {
     marginTop: theme.spacing(0),
@@ -216,6 +218,9 @@ const getTableTitle = (str) =>{
   }else if (str === 'positive')
   {
     return `Positive Results`;
+  }else if (str === 'trace')
+  {
+    return `Patients to Trace`;
   }else if (str === 'deleted')
   {
     return `Archived Records`;
@@ -254,6 +259,9 @@ const getTableIcon = (str) =>{
   }else if (str === 'positive')
   {
     return <AddCircleOutlineIcon style={{fontSize:"2.2rem"}} />
+  }else if (str === 'trace')
+  {
+    return <CallIcon style={{fontSize:"2.2rem"}} />;
   }else if (str === 'deleted')
   {
     return <DeleteIcon style={{fontSize:"2.2rem"}} />;
@@ -592,6 +600,11 @@ export default function BookingTable(props) {
     {
       api = BookService.getDeletedBookings;
     }
+    else if (props.date === 'trace')
+    {
+      api = BookService.getTraceFolderBookings;
+    }
+
      
     setData({bookings: [], cachedBookings: [], isFetching: true});
    

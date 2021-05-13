@@ -51,6 +51,7 @@ import FileCopyOutlinedIcon from "@material-ui/icons/FileCopyOutlined";
 import { CalendarColors } from "../Admin/calendar-admin/colors";
 import InvoiceDialog from "../InvoiceDialog";
 import InvoiceService from "../services/InvoiceService";
+import CallIcon from '@material-ui/icons/Call';
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -290,6 +291,19 @@ const useStyles = makeStyles((theme) => ({
     padding: "10px",
   },
 
+  UndoTraceButton: {
+    marginBottom: "20px",
+    backgroundColor: "#266900",
+    color: "#fff",
+    "&:hover": {
+      background: "#319400",
+      color: "#fff",
+    },
+    textDecoration: "none !important",
+    padding: "10px",
+  },
+
+
   DeleteButton: {
     marginBottom: "20px",
     backgroundColor: "#b80012", 
@@ -301,6 +315,19 @@ const useStyles = makeStyles((theme) => ({
 
     padding: "10px",
   },
+
+  MoveToTraceButton: {
+    marginBottom: "20px",
+    backgroundColor: "#de3800", 
+    color: "#fff",
+    "&:hover": {
+      background: "#f73e00",
+      color: "#fff",
+    },
+
+    padding: "10px",
+  },
+
 
   SaveButton: {
     marginBottom: "10px",
@@ -418,6 +445,16 @@ export default function BookingDialog(props) {
     restore: false,
     person: null,
   });
+
+  const [traceMode, setTraceMode] = React.useState({
+    trace: false,
+    person: null,
+  });
+  const [unTraceMode, setUnTraceMode] = React.useState({
+    untrace: false,
+    person: null,
+  });
+
 
   const [saving, setSaving] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
@@ -687,6 +724,61 @@ export default function BookingDialog(props) {
     }
   };
 
+
+
+  const traceBooking = (id) => {
+    setDeleting(true);
+    bookingService
+      .moveToTraceFolderBooking(id)
+      .then((res) => {
+        setDeleting(false);
+        setTraceMode({ trace: false, person: null });
+        setRefreshData(!refreshData);
+      })
+      .catch((err) => {
+        setDeleting(false);
+        setTraceMode({ trace: false, person: null });
+        console.log(err);
+      });
+  };
+
+  const unTraceBooking = (id) => {
+    setRestoring(true);
+    bookingService
+      .undoMoveToTraceFolderBooking(id)
+      .then((res) => {
+        setRestoring(false);
+        setUnTraceMode({ untrace: false, person: null });
+        setRefreshData(!refreshData);
+      })
+      .catch((err) => {
+        setRestoring(false);
+        setUnTraceMode({ untrace: false, person: null });
+        console.log(err);
+      });
+  };
+
+  const handleTraceModeChanged = (del, person) => {
+    if (del) {
+      setTraceMode({ trace: del, person: person });
+    } else if (!del && !person) {
+      setTraceMode({ trace: del, person: person });
+    } else if (!del && person) {
+      traceBooking(person._id);
+    }
+  };
+
+  const handleUnTraceModeChanged = (restore, person) => {
+    if (restore) {
+      setUnTraceMode({ untrace: restore, person: person });
+    } else if (!restore && !person) {
+      setUnTraceMode({ untrace: restore, person: person });
+    } else if (!restore && person) {
+      unTraceBooking(person._id);
+    }
+  };
+
+
   const changeBackToBookingMade = (event, id) => {
     setSaving(true);
     BookService.changeBackToBookingMade(id)
@@ -887,7 +979,7 @@ export default function BookingDialog(props) {
             <DialogTitle
               id="alert-dialog-slide-title"
               className={classes.dialogTitle}
-              style={{position:"relative"}}
+              style={!booking.deleted && booking.traceFolder ? {backgroundColor:"#de3800", position:"relative"} : {position:"relative"}}
             >
               {booking.questions && (
                  <div style={{position:"absolute", right:"10px", top:"12px", backgroundColor:"#069c00", fontSize:"0.85rem", padding:"8px", borderRadius:"10px"}}>
@@ -911,7 +1003,14 @@ export default function BookingDialog(props) {
                             paddingBottom: "5px",
                             textDecoration: "line-through",
                           }
-                        : {}
+                        : (
+                          booking.traceFolder ? {
+                            paddingBottom: "5px",
+
+                          } : {
+
+                          }
+                        )
                     }
                   >
                     {`${booking.fullname}`}
@@ -932,6 +1031,22 @@ export default function BookingDialog(props) {
                     </Tooltip>
                   </Grid>
                 )}
+
+                {!booking.deleted && booking.traceFolder && (
+                  <Grid item>
+                    <Tooltip title="This record is in the TRACE folder.">
+                      <CallIcon
+                        style={{
+                          padding: 0,
+                          margin: 0,
+                          color: "#fff",
+                          fontSize: "2rem",
+                        }}
+                      />
+                    </Tooltip>
+                  </Grid>
+                )}
+
               </Grid>
             </DialogTitle>
             <DialogContent>
@@ -1327,6 +1442,8 @@ export default function BookingDialog(props) {
                       <li
                         hidden={
                           props.deleteButtonDisabled ||
+                          unTraceMode.untrace ||
+                          traceMode.trace ||
                           booking.deleted ||
                           editMode.edit ||
                           (deleteMode.delete &&
@@ -1416,6 +1533,199 @@ export default function BookingDialog(props) {
                       </li>
 
                       {/* ****************************************************************************************** */}
+
+
+
+                      {/* UnTrace Functionality ******************************************* */}
+                      <li
+                        hidden={
+                          !(
+                            unTraceMode.untrace &&
+                            unTraceMode.person._id === booking._id
+                          )
+                        }
+                      >
+                        <div
+                          style={{
+                            fontWeight: "500",
+                            paddingBottom: "10px",
+                            paddingLeft: "5px",
+                            fontSize: "16px",
+                            color: "#333",
+                          }}
+                        >
+                          Are you sure you want to take this record out of TRACE folder?
+                        </div>
+                      </li>
+
+                      <li
+                        hidden={
+                          deleteMode.delete ||
+                          !booking.traceFolder ||
+                          booking.deleted ||
+                          (unTraceMode.untrace &&
+                            unTraceMode.person._id === booking._id)
+                        }
+                      >
+                        <Button
+                          type="button"
+                          fullWidth
+                          variant="contained"
+                          color="primary"
+                          onClick={() => {
+                            handleUnTraceModeChanged(true, booking);
+                          }}
+                          className={classes.UndoTraceButton}
+                        >
+                          Take This out of Trace Folder
+                        </Button>
+                      </li>
+
+                      <li
+                        hidden={
+                          !(
+                            unTraceMode.untrace &&
+                            unTraceMode.person._id === booking._id
+                          )
+                        }
+                      >
+                        <Button
+                          type="button"
+                          fullWidth
+                          variant="contained"
+                          color="primary"
+                          disabled={restoring}
+                          onClick={() => {
+                            handleUnTraceModeChanged(false, booking);
+                          }}
+                          className={classes.SaveButton}
+                        >
+                          YES, Take this record out of TRACE Folder!
+                        </Button>
+                      </li>
+
+                      <li
+                        hidden={
+                          !(
+                            unTraceMode.untrace &&
+                            unTraceMode.person._id === booking._id
+                          )
+                        }
+                      >
+                        <Button
+                          type="button"
+                          fullWidth
+                          variant="contained"
+                          color="default"
+                          disabled={restoring}
+                          onClick={() => {
+                            handleUnTraceModeChanged(false, null);
+                          }}
+                          className={classes.CancelButton}
+                        >
+                          Cancel
+                        </Button>
+                      </li>
+
+                      {/*  ******************************************************************* */}
+
+                      {/* Move To Trace Folder Functionality ******************************************* */}
+
+                      <li
+                        hidden={
+                          !(
+                            traceMode.trace &&
+                            traceMode.person._id === booking._id
+                          )
+                        }
+                      >
+                        <div
+                          style={{
+                            fontWeight: "600",
+                            paddingBottom: "10px",
+                            paddingLeft: "5px",
+                            fontSize: "16px",
+                          }}
+                        >
+                          Are you sure you want to move this record to TRACE folder?
+                        </div>
+                      </li>
+
+                      <li
+                        hidden={
+                          booking.deleted ||
+                          booking.traceFolder || 
+                          deleteMode.delete ||
+                          editMode.edit ||
+                          (traceMode.trace &&
+                            traceMode.person._id === booking._id)
+                        }
+                      >
+                        {
+                          <Button
+                            type="button"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                              handleTraceModeChanged(true, booking);
+                            }}
+                            className={classes.MoveToTraceButton}
+                          >
+                            Move To Trace Folder
+                          </Button>
+                        }
+                      </li>
+
+                      <li
+                        hidden={
+                          !(
+                            traceMode.trace &&
+                            traceMode.person._id === booking._id
+                          )
+                        }
+                      >
+                        <Button
+                          type="button"
+                          fullWidth
+                          variant="contained"
+                          color="primary"
+                          disabled={deleting}
+                          onClick={() => {
+                            handleTraceModeChanged(false, booking);
+                          }}
+                          className={classes.SaveButton}
+                        >
+                          YES, Move To TRACE Folder!
+                        </Button>
+                      </li>
+
+                      <li
+                        hidden={
+                          !(
+                            traceMode.trace &&
+                            traceMode.person._id === booking._id
+                          )
+                        }
+                      >
+                        <Button
+                          type="button"
+                          fullWidth
+                          variant="contained"
+                          color="default"
+                          disabled={deleting}
+                          onClick={() => {
+                            handleTraceModeChanged(false, null);
+                          }}
+                          className={classes.CancelButton}
+                        >
+                          Cancel
+                        </Button>
+                      </li>
+
+                      {/* ****************************************************************************************** */}
+
+
                     </ul>
                   </div>
                 </Grid>

@@ -29,9 +29,9 @@ export default class PatientService {
        return API.get(`/api/optimalvision/patient/getpatientbyid?id=${id}`);
     }
 
-    static getPatientByPatientId = (patiantID) =>
+    static getPatientByPatientId = (patientID) =>
     {
-       return API.get(`/api/optimalvision/patient/getpatientbypatientid?patiantID=${patiantID}`);
+       return API.get(`/api/optimalvision/patient/getpatientbypatientid?patientID=${patientID}`);
     }
 
     static getAllPatients = () =>

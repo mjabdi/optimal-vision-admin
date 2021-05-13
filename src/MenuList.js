@@ -15,6 +15,7 @@ import DateRangeIcon from "@material-ui/icons/DateRange";
 import EventNoteIcon from "@material-ui/icons/EventNote";
 import AirplanemodeActiveIcon from "@material-ui/icons/AirplanemodeActive";
 import AccessibilityIcon from '@material-ui/icons/Accessibility';
+import CallIcon from '@material-ui/icons/Call';
 
 /// PCR ------------------
 import FindByRef from "./PCR/FindByRef";
@@ -55,7 +56,7 @@ import PatientsTable from "./OV/PatientsTable";
 
 export const MenuList_OV_Admin = [
   {
-    index: 0,
+    index: 1,
     id: `recentBookings`,
     title: `Recent Bookings`,
     icon: <AutorenewIcon />,
@@ -86,18 +87,24 @@ export const MenuList_OV_Admin = [
   },
   {
     index: 6,
+    id: `traceBookings`,
+    title: `Patients to Trace`,
+    icon: <CallIcon />,
+  },
+  {
+    index: 7,
     id: `deletedBookings`,
     title: `Archived Records`,
     icon: <DeleteIcon />,
   },
   {
-    index: 7,
+    index: 8,
     id: `calendarView`,
     title: `Calendar View`,
     icon: <DateRangeIcon />,
   },
   {
-    index: 8,
+    index: 9,
     id: `patientsList`,
     title: `Patients`,
     icon: <AccessibilityIcon />,
@@ -386,7 +393,7 @@ export const MenuList_PCR = [
 export const getMenuContent = (role, index) => {
    if (role === "ovadmin") {
     switch (index) {
-      case 0:
+      case 1:
         return <OVBookingTable date="recent" />;
       case 2:
         return <OVBookingTable date="today" />;
@@ -397,10 +404,12 @@ export const getMenuContent = (role, index) => {
       case 5:
         return <OVBookingTable date="all" />;
       case 6:
-        return <OVBookingTable date="deleted" />;
+        return <OVBookingTable date="trace" />; 
       case 7:
-        return <OVCalendarView />;  
+        return <OVBookingTable date="deleted" />;
       case 8:
+        return <OVCalendarView />;  
+      case 9:
         return <PatientsTable />;  
   
       default:

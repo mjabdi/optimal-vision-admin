@@ -89,7 +89,7 @@ export default function Navigator() {
             }
              setState(state => ({...state, signedIn: true, signedUp: false, forgotPassword: false, userId: userId, role: getRole()}));
             
-             history.push(getGlobalPath(`/${getMenuId(getRole(),0)}`));
+             history.push(getGlobalPath(`/${getMenuId(getRole(),1)}`));
            }
            else
            {

@@ -11,6 +11,7 @@ import {
     Divider,
     FormControlLabel,
     Grid,
+    IconButton,
     InputAdornment,
     InputLabel,
     Link,
@@ -55,6 +56,10 @@ import DateField from "./DateField";
 import EditIcon from '@material-ui/icons/Edit';
 import DateDialog from "./DateDialog";
 import ChooseClinicDialog from "./ChooseClinicDialog"
+import PatientDialog from "./PatientDialog";
+import PatientService from "./services/PatientService";
+import SearchIcon from '@material-ui/icons/Search';
+
 
 var interval;
 
@@ -212,6 +217,11 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: "600"
     },
 
+    SearchIcon:{
+        fontSize: "2rem",
+        color: theme.palette.primary.main,
+    }
+
 
 }));
 
@@ -336,6 +346,14 @@ export default function EditOVBookingDialog(props) {
     const [date, setDate] = React.useState("")
     const [time, setTime] = React.useState("")
 
+    const [selectedPatient, setSelectedPatient] = React.useState(null)
+    const [patientDialogOpen, setPatientDialogOpen] = React.useState(false)
+
+    const handleClosePatientDialog = () => {
+      setPatientDialogOpen(false)
+    }
+  
+
     const patientIDChanged = (event) => {
         setPatientID(event.target.value);
     };
@@ -379,9 +397,31 @@ export default function EditOVBookingDialog(props) {
 
             setClinic(props.clinic)
 
+            loadPatient()
+
         }
 
     }, [props.open, props.booking])
+
+    const loadPatient = async () =>
+    {
+        try{
+            setSelectedPatient(null)
+            if (props.booking.patientID && props.booking.patientID.length > 0)
+            {
+                const res = await PatientService.getPatientByPatientId(props.booking.patientID)
+                if (res && res.data)
+                {
+                    const patiant = res.data
+                    setSelectedPatient(patiant)
+                }
+            }
+        }
+        catch(err)
+        {
+            console.error(err)
+        }
+    }
 
 
     const birthDateChanged = (dateStr) => {
@@ -423,6 +463,7 @@ export default function EditOVBookingDialog(props) {
         setPrescriptionLeft("")
         setPrescriptionRight("")
         setClinic("")
+        setSelectedPatient(null)
 
 
         props.handleClose();
@@ -661,15 +702,28 @@ export default function EditOVBookingDialog(props) {
                                     </Grid>
 
                                     <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Patient ID"
-                                            value={patientID}
-                                            onChange={patientIDChanged}
-                                            name="patientid"
-                                            id="patientid-id"
-                                            autoComplete="none"
-                                        />
+                                        <Grid container alignItems="center">
+                                            <Grid item xs={10}>
+                                                <TextField
+                                                    fullWidth
+                                                    label="Patient ID"
+                                                    value={patientID}
+                                                    onChange={patientIDChanged}
+                                                    name="patientid"
+                                                    id="patientid-id"
+                                                    autoComplete="none"
+                                                />
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                {selectedPatient && (
+                                                    <Tooltip title="Show Patient Detail">
+                                                        <IconButton onClick={() => { setPatientDialogOpen(true) }}>
+                                                            <SearchIcon className={classes.SearchIcon} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
 
 
@@ -878,6 +932,17 @@ export default function EditOVBookingDialog(props) {
                     handleClose={handleCloseClinicDialog}
                     clinicClicked={handleClinicClicked}
             />
+
+            {selectedPatient && (
+                <PatientDialog
+                    patient={selectedPatient}
+                    open={patientDialogOpen}
+                    handleClose={handleClosePatientDialog}
+                    title={`${selectedPatient.name?.toUpperCase()} ${selectedPatient.surname?.toUpperCase()}`}
+                    saveButtonText={"Save Changes"}
+                />
+            )}
+
             
             
         </React.Fragment>

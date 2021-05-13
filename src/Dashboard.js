@@ -757,7 +757,7 @@ export default function Dashboard() {
                 maxWidth={isMobile ? "xs" : "xl"}
                 className={classes.container}
               >
-                {getMenuContent(state.role, currentMenuIndex)}
+                {currentMenuIndex > 0 && getMenuContent(state.role, currentMenuIndex)}
               </Container>
             </main>
           </div>

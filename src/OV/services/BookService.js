@@ -106,6 +106,16 @@ export default class BookService {
    {
       return API.post(`/api/optimalvision/book/undeletebookappointment?id=${id}`);
    } 
+
+   static moveToTraceFolderBooking = (id) =>
+   {
+      return API.post(`/api/optimalvision/book/movetotracebookappointment?id=${id}`);
+   } 
+
+   static undoMoveToTraceFolderBooking = (id) =>
+   {
+      return API.post(`/api/optimalvision/book/undomovetotracebookappointment?id=${id}`);
+   } 
    
     static getBookingsByRef = (ref) =>
     {
@@ -123,11 +133,25 @@ export default class BookService {
       return API.get(`/api/optimalvision/book/getallbookings?limit=${limit}`);
     }
 
+    static getTraceFolderBookings = (limit) =>
+    {
+      if (!limit) limit = 25 
+      return API.get(`/api/optimalvision/book/gettracefolderdbookings?limit=${limit}`);
+    }
+
+
     static getDeletedBookings= (limit) =>
     {
       if (!limit) limit = 25 
        return API.get(`/api/optimalvision/book/getdeletedbookings?limit=${limit}`);
     }
+
+    static getTraceFolderBookings= (limit) =>
+    {
+      if (!limit) limit = 25 
+       return API.get(`/api/optimalvision/book/gettracefolderbookings?limit=${limit}`);
+    }
+
 
     static getTodayBookings= () =>
     {
