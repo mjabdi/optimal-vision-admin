@@ -15,7 +15,7 @@ import Navigator from './Navigator';
 
 
 function App() {
-  const [state, setState] = React.useState({currentMenuIndex:0});
+  const [state, setState] = React.useState({currentMenuIndex:1});
 
   return (
     <GlobalState.Provider value={[state, setState]}>

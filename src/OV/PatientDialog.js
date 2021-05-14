@@ -383,15 +383,17 @@ export default function PatientDialog(props) {
                         >
                             <Tab label="Personal Details" {...a11yProps(0)} />
                             <Tab label={`History & Symptoms`} {...a11yProps(1)} />
-                            <Tab label="Dry Eyes" {...a11yProps(2)} />
+                            <Tab label={`Notes From Consultation`} {...a11yProps(2)} />
+
+                            {/* <Tab label="Dry Eyes" {...a11yProps(2)} />
                             <Tab label="Ocular Examination" {...a11yProps(3)} />
                             <Tab label="Diagnostics" {...a11yProps(4)} />
                             <Tab label="Uncorrected VA" {...a11yProps(5)} />
                             <Tab label="Refraction" {...a11yProps(6)} />
                             <Tab label="Auto Refraction" {...a11yProps(7)} />
                             <Tab label="Manifest Refraction" {...a11yProps(8)} />
-                            <Tab label="Target Refraction" {...a11yProps(9)} />
-                            <Tab label="Recommendation" {...a11yProps(10)} />
+                            <Tab label="Target Refraction" {...a11yProps(9)} /> */}
+                            <Tab label="Recommendation" {...a11yProps(3)} />
                         </Tabs>
                         <TabPanel value={value} index={0}>
                             <Grid container spacing={4}>
@@ -820,6 +822,23 @@ export default function PatientDialog(props) {
                                 </Grid>
                                 <Grid item xs={12} md={6}>
                                     <TextField
+                                        name="othernotes"
+                                        id="othernotes"
+                                        label="Other Notes"
+                                        fullWidth
+                                        multiline
+                                        rows={10}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.othernotes || ''}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, othernotes: event.target.value } })
+                                        }}
+
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
                                         name="driver"
                                         id="driver"
                                         label="Driver"
@@ -836,26 +855,9 @@ export default function PatientDialog(props) {
 
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        name="othernotes"
-                                        id="othernotes"
-                                        label="Other Notes"
-                                        fullWidth
-                                        multiline
-                                        rows={3}
-                                        variant="outlined"
-                                        autoComplete="none"
-                                        value={patient.formData.othernotes || ''}
-                                        onChange={(event) => {
-                                            setPatient({ ...patient, formData: { ...patient.formData, othernotes: event.target.value } })
-                                        }}
-
-                                    />
-                                </Grid>
                             </Grid>
                         </TabPanel>
-                        <TabPanel value={value} index={2}>
+                        {/* <TabPanel value={value} index={2}>
                             <Grid container spacing={4}>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
@@ -2835,8 +2837,32 @@ export default function PatientDialog(props) {
                                 </Grid>
                             </Grid>
 
+                        </TabPanel> */}
+
+                        <TabPanel value={value} index={2}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name="notesfromconsultation"
+                                        id="notesfromconsultation"
+                                        label="Notes From Consultation"
+                                        fullWidth
+                                        multiline
+                                        rows={25}
+                                        variant="outlined"
+                                        autoComplete="none"
+                                        value={patient.formData.notesfromconsultation || ''}
+                                        onChange={(event) => {
+                                            setPatient({ ...patient, formData: { ...patient.formData, notesfromconsultation: event.target.value } })
+                                        }}
+                                    />
+
+                                </Grid>
+                            </Grid>
                         </TabPanel>
-                        <TabPanel value={value} index={10}>
+
+
+                        <TabPanel value={value} index={3}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
@@ -2845,7 +2871,7 @@ export default function PatientDialog(props) {
                                         label="Recommendation"
                                         fullWidth
                                         multiline
-                                        rows={15}
+                                        rows={25}
                                         variant="outlined"
                                         autoComplete="none"
                                         value={patient.formData.recommendation || ''}

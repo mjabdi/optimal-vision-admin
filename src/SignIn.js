@@ -181,8 +181,8 @@ export default function SignIn() {
 
           setState((state) => ({ ...state, signedIn: true }));
           setRole(res.data.roles[0])
-          setState((state) => ({ ...state, currentMenuIndex: 0 }));
-          history.push(getGlobalPath(`/${getMenuId(res.data.roles[0], 0)}`));
+          setState((state) => ({ ...state, currentMenuIndex: 1 }));
+          history.push(getGlobalPath(`/${getMenuId(res.data.roles[0], 1)}`));
         } else if (res.data.status === "FAILED") {
           setError(res.data.error);
         } else {
