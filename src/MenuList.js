@@ -16,6 +16,9 @@ import EventNoteIcon from "@material-ui/icons/EventNote";
 import AirplanemodeActiveIcon from "@material-ui/icons/AirplanemodeActive";
 import AccessibilityIcon from '@material-ui/icons/Accessibility';
 import CallIcon from '@material-ui/icons/Call';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import SmsIcon from '@material-ui/icons/Sms';
+import DraftsIcon from '@material-ui/icons/Drafts';
 
 /// PCR ------------------
 import FindByRef from "./PCR/FindByRef";
@@ -51,6 +54,7 @@ import STDCalendarView from "./STD/calendar-admin/CalendarView";
 import OVBookingTable from "./OV/BookingTable";
 import OVCalendarView from "./OV/calendar-admin/CalendarView";
 import PatientsTable from "./OV/PatientsTable";
+import EmailTemplstesTable from "./OV/EmailTemplatesTable"
 
 //---------------
 
@@ -109,8 +113,18 @@ export const MenuList_OV_Admin = [
     title: `Patients`,
     icon: <AccessibilityIcon />,
   },
-
-
+  {
+    index: 10,
+    id: `emailTemplates`,
+    title: `Email Templates`,
+    icon: <DraftsIcon />,
+  },
+  {
+    index: 11,
+    id: `smsTemplates`,
+    title: `SMS Templates`,
+    icon: <SmsIcon />,
+  },
 
 ];
 
@@ -411,6 +425,8 @@ export const getMenuContent = (role, index) => {
         return <OVCalendarView />;  
       case 9:
         return <PatientsTable />;  
+      case 10:
+          return <EmailTemplstesTable />
   
       default:
         return `Page Not Found!`;
