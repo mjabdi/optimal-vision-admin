@@ -63,9 +63,13 @@ import { EditorState, convertToRaw, convertFromHTML, ContentState } from 'draft-
 import { Editor } from 'react-draft-wysiwyg';
 import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
-import {htmlToText} from 'html-to-text';
-import {stateFromHTML} from 'draft-js-import-html';
+import { htmlToText } from 'html-to-text';
+import { stateFromHTML } from 'draft-js-import-html';
 import "./react-draft-wysiwyg.css";
+import TemplateService from "./services/EmailTemplateService";
+
+import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 
 function TabPanel(props) {
@@ -175,18 +179,21 @@ export default function EmailTemplateDialog(props) {
 
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
 
+    const [variable, setVariable] = React.useState({})
+    const [variableErrors, setVariableErrors] = React.useState({})
+
 
     // const [editorState, setEditorState] = React.useState(EditorState.createWithContent(stateFromHTML(`<p>...</p>`)))
     const [editorState, setEditorState] = React.useState(EditorState.createEmpty())
 
-    const onEditorStateChange = (_editorState) =>
-    {
+    const onEditorStateChange = (_editorState) => {
         setEditorState(_editorState)
         const html = draftToHtml(convertToRaw(editorState.getCurrentContent()))
-        settemplate({...template, 
-                    html: html,
-                    rawText: htmlToText(html),
-         }) 
+        settemplate({
+            ...template,
+            html: html,
+            rawText: htmlToText(html),
+        })
     }
 
 
@@ -203,31 +210,39 @@ export default function EmailTemplateDialog(props) {
         if (props.open) {
 
             if (props.template) {
-                settemplate({ ...props.template})
+                let parameters = []
+                try{
+                    parameters = JSON.parse(props.template.parameters)
+                }
+                catch(err){}
+
+                settemplate({ ...props.template, parameters: parameters})
                 const html = props.template.html
                 const contentBlock = htmlToDraft(html);
                 if (contentBlock) {
                     const contentState = ContentState.createFromBlockArray(
-                      contentBlock.contentBlocks
+                        contentBlock.contentBlocks
                     );
                     const _editorState = EditorState.createWithContent(contentState);
                     setEditorState(_editorState)
-                  }
+                }
             }
             else {
-                const html = '<p style="font-size:16px">You can write your <strong>Text</strong> here ... 😀</p>';
+                const html = '<p style="font-size:16px">Please delete this and write your <strong>Text</strong> here ... 😀</p>';
                 const contentBlock = htmlToDraft(html);
                 if (contentBlock) {
                     const contentState = ContentState.createFromBlockArray(
-                      contentBlock.contentBlocks
+                        contentBlock.contentBlocks
                     );
                     const _editorState = EditorState.createWithContent(contentState);
                     setEditorState(_editorState)
-                    settemplate({...template, 
-                                html: html,
-                                rawText: htmlToText(html),
-                     })             
-                  }
+                    settemplate({
+                        ...template,
+                        parameters: [],
+                        html: html,
+                        rawText: htmlToText(html),
+                    })
+                }
             }
         }
     }, [props.template, props.open])
@@ -242,6 +257,10 @@ export default function EmailTemplateDialog(props) {
         setNameError(false)
         setSurnameError(false)
         settemplateRepeated(false)
+        settemplatenameuser('')
+        settemplatenameusererror(false)
+        setVariable({})
+        setVariableErrors({})
     };
 
     const saveClicked = async () => {
@@ -254,16 +273,16 @@ export default function EmailTemplateDialog(props) {
         try {
             settemplateRepeated(false)
             setSaving(true)
-            template.paremeters = JSON.stringify(template.parameters)
+            const parameters = JSON.stringify(template.parameters)
             if (props.template) {
-                const res = await templateService.updateTemplate({ id: template._id, template: template })
+                const res = await templateService.updateTemplate({ id: template._id, template: {...template, parameters: parameters} })
                 setSaving(false)
                 if (res.data.status === "OK") {
                     setState(state => ({ ...state, templateDialogDataChanged: !state.templateDialogDataChanged }))
                     handleClose();
                 }
             } else {
-                const res = await templateService.registerNewTemplate({ template: template })
+                const res = await templateService.registerNewTemplate({ template: {...template, parameters: parameters}  })
                 setSaving(false)
                 if (res.data.status === "OK") {
                     setState(state => ({ ...state, templateDialogDataChanged: !state.templateDialogDataChanged }))
@@ -283,11 +302,16 @@ export default function EmailTemplateDialog(props) {
 
     const deleteClicked = async () => {
 
+        if (templatenameuser !== props.template.templateID) {
+            settemplatenameusererror(true)
+            return
+        }
+
         setOpenDeleteDialog(false)
 
         setSaving(true)
         try {
-            await templateService.deletetemplate(props.template._id)
+            await templateService.deleteTemplate(props.template._id)
             setSaving(false)
             setState((state) => ({
                 ...state,
@@ -332,41 +356,63 @@ export default function EmailTemplateDialog(props) {
 
     const [selectedVersion, setSelectedVersion] = React.useState(0)
 
-    const showHistoryComboBox = () => {
-        return (
-            <React.Fragment>
-                <div style={{ marginTop: "-10px" }}>
-                    <span style={{ color: "#fff", fontWeight: "500", fontSize: "1rem", marginRight: "10px" }}>
-                        Version :
-                    </span>
-                    <Select
-                        label="Version"
-                        labelId="version-label"
-                        id="version-label"
-                        style={{ color: "#fff", padding: "0px 10px" }}
-                        value={selectedVersion}
-                        onChange={(event) => {
-                            setSelectedVersion(event.target.value)
-                            if (event.target.value === 0) {
-                                settemplate({ ...template, formData: backupFormData })
-                            } else {
-                                settemplate({ ...template, formData: history[event.target.value - 1] })
-                            }
+    const [templatenameuser, settemplatenameuser] = React.useState('')
+    const [templatenameusererror, settemplatenameusererror] = React.useState(false)
 
-                        }}
+    const addVariableCliced = () => {
+        setVariableErrors({})
+        if (!ValidateVariable()) {
+            return
+        }
 
-                    >
-                        <MenuItem value={0}>{`${formatDate(template.formData.timeStamp)} ( Current )`}</MenuItem>
+        const _variable = {
+            keyword: variable.keyword,
+            type: variable.type,
+            builtinValue: variable.builtinValue,
+            defaultValue: variable.defaultValue
+        }
 
-                        {history.map((item, index) => (
-                            <MenuItem value={index + 1}>{`${formatDate(item.timeStamp)} ( History )`}</MenuItem>
-                        ))
-                        }
-                    </Select>
+        settemplate({ ...template, parameters: [...template.parameters, _variable] })
+        setVariable({})
+    }
 
-                </div>
-            </React.Fragment>
-        )
+    const ValidateVariable = () => {
+        var error = false
+        if (!variable.keyword) {
+            setVariableErrors((prev) => prev = { ...prev, keywordError: true })
+            error = true
+        }
+
+        if (variable.keyword)
+        {
+            if (template.parameters.find(e => e.keyword === variable.keyword))
+            {
+                setVariableErrors((prev) => prev = { ...prev, keywordError: true })
+                error = true
+            }
+        }
+
+        if (!variable.type) {
+            // setVariableErrors((prev) => prev = { ...prev, typeError: true })
+            // error = true
+            setVariable({...variable, type:"builtin"})
+        }
+
+        if ((variable.type === "builtin" || !variable.type) && !variable.builtinValue) {
+            setVariableErrors((prev) => prev = { ...prev, builtinValueError: true })
+            error = true
+        }
+
+
+
+
+
+        return !error
+    }
+
+    const deleteParameter = (_keyword) =>
+    {
+        settemplate({...template, parameters: template.parameters.filter(e => e.keyword !== _keyword)})
     }
 
 
@@ -408,46 +454,187 @@ export default function EmailTemplateDialog(props) {
 
                         </Tabs>
                         <TabPanel value={value} index={0}>
-                            <Grid container spacing={2}>
+                            <Grid container spacing={1}>
                                 <Grid item xs={12}>
-                                    <TextField
-                                        disabled={props.template}
-                                        name="templatename"
-                                        id="templatename"
-                                        label="Template Name"
-                                        fullWidth
-                                        required
-                                        helperText={templateRepeated ? '* This Name is already assigned to another template! Please choose a different name.' : '* Please give a unique name to each templete.'}
-                                        error={templateIDError}
-                                        value={template.templateID || ''}
-                                        onChange={(event) => {
-                                            settemplate({ ...template, templateID: event.target.value })
-                                            settemplateIDError(false)
-                                        }}
-                                        autoComplete="none"
-                                        variant="outlined"
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                        <Editor
-                                            autoFocus
-                                            editorState={editorState}
-                                            wrapperClassName="demo-wrapper"
-                                            editorClassName="demo-editor"
-                                            onEditorStateChange={onEditorStateChange}
+                                    <Grid container spacing={2} alignItems="center">
+                                        <Grid item xs={8}>
+                                            <TextField
+                                                // disabled={props.template}
+                                                name="templatename"
+                                                id="templatename"
+                                                label="Template Name"
+                                                fullWidth
+                                                required
+                                                helperText={templateRepeated ? '* This Name is already assigned to another template! Please choose a different name.' : '* Please give a unique name to each templete.'}
+                                                error={templateIDError}
+                                                value={template.templateID || ''}
+                                                onChange={(event) => {
+                                                    settemplate({ ...template, templateID: event.target.value })
+                                                    settemplateIDError(false)
+                                                }}
+                                                autoComplete="none"
+                                                variant="outlined"
                                             />
+
+                                        </Grid>
+                                        {props.template && (
+                                            <Grid item xs={4}>
+                                                <Button onClick={() => setOpenDeleteDialog(true)} variant="contained" style={{ backgroundColor: "#d10202", color: "#fff", marginBottom: "5px" }}>
+                                                    Delete This Template
+                                                </Button>
+                                            </Grid>
+                                        )}
+
+                                    </Grid>
+
                                 </Grid>
-                                {/* <Grid item xs={12}>
-                                 <textarea
-                                    disabled
-                                    value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
+                                <Grid item xs={12}>
+                                    <Editor
+                                        autoFocus
+                                        editorState={editorState}
+                                        wrapperClassName="demo-wrapper"
+                                        editorClassName="demo-editor"
+                                        onEditorStateChange={onEditorStateChange}
                                     />
-                                </Grid> */}
+                                </Grid>
                             </Grid>
                         </TabPanel>
                         <TabPanel value={value} index={1}>
-                        </TabPanel>
+                            <Grid container direction="column" spacing={2}>
+                                <Grid item>
+                                    <Grid container direction="row" spacing={1} alignItems="bottom">
+                                        <Grid item xs={2}>
+                                            <TextField
+                                                name="keyword"
+                                                id="keyword"
+                                                label="Keyword"
+                                                fullWidth
+                                                required
+                                                error={variableErrors.keywordError}
+                                                helperText={'This is the TEXT within your email that you want to be replaced by a value'}
+                                                autoComplete="none"
+                                                variant="outlined"
+                                                value={variable.keyword || ''}
+                                                onChange={(event) => setVariable({ ...variable, keyword: event.target.value })}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={2}>
+                                            <FormControl
+                                                error={variableErrors.typeError}
+                                                fullWidth
+                                                required variant="outlined" className={classes.formControl}>
+                                                <InputLabel id="typeid">Type</InputLabel>
+                                                <Select
+                                                    labelId="typeid"
+                                                    id="type"
+                                                    value={variable.type || 'builtin'}
+                                                    onChange={(event) => setVariable({ ...variable, type: event.target.value })}
+                                                    label="Type"
+                                                >
+                                                    <MenuItem value={'builtin'}>Built-in Variable</MenuItem>
+                                                    <MenuItem value={'userinput'}>User Input Variable</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={2}>
+                                            <FormControl
+                                                error={variableErrors.builtinValueError}
+                                                disabled={variable.type && variable.type !== 'builtin'} fullWidth required variant="outlined" className={classes.formControl}>
+                                                <InputLabel id="builtinvalueid">Built-in Value</InputLabel>
+                                                <Select
+                                                    labelId="builtinvalueid"
+                                                    id="builtinvalue"
+                                                    value={variable.builtinValue || null}
+                                                    onChange={(event) => setVariable({ ...variable, builtinValue: event.target.value })}
+                                                    label="Built-in Value"
+                                                >
+                                                    <MenuItem value={'name'}>Patient Name</MenuItem>
+                                                    <MenuItem value={'surname'}>Patient Surname</MenuItem>
+                                                    <MenuItem value={'fullname'}>Patient Fullname</MenuItem>
+                                                    <MenuItem value={'birthdate'}>Patient BirthDate</MenuItem>
+                                                    <MenuItem value={'todaydate'}>Today Date</MenuItem>
+                                                    <MenuItem value={'todaydatetime'}>Today DateTime</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={2}>
+                                            <TextField
+                                                name="defaultvalue"
+                                                id="defaultvalue"
+                                                label="Default Value"
+                                                fullWidth
+                                                autoComplete="none"
+                                                helperText={'* This value is used if the variable is empty.'}
+                                                variant="outlined"
+                                                value={variable.defaultValue || ''}
+                                                onChange={(event) => setVariable({ ...variable, defaultValue: event.target.value })}
 
+                                            />
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Button onClick={addVariableCliced} startIcon={<AddIcon />} variant="contained" color="primary" fullWidth style={{ height: "55px" }}>
+                                                Add Variable
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                    </Grid>
+
+                                    <Grid item style={{marginTop:"20px", fontWeight:"500", height:"20px"}}>
+                                         <Divider/>
+                                         <Grid container direction="row" spacing={1} alignItems="center">
+                                                <Grid item xs={2}>
+                                                    {"Keyword"}
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                    {"Type"}
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                    {"Built-in Value"}
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                    {"Default Value"}
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                </Grid>
+                                            </Grid>
+                                            <Divider/>
+                                      </Grid>      
+
+                                    {(!template.parameters || template.parameters.length === 0) && (
+                                        <Grid item>
+                                            <div style={{width:"100%", textAlign:"center", color:"#777", marginTop:"50px"}}>
+                                                 No Parameters Defined
+                                            </div>                                           
+                                        </Grid>    
+                                    )}
+
+                                    {template.parameters && template.parameters.length > 0 && template.parameters.map((item => (
+                                        <Grid item style={{marginTop:"10px", fontWeight:"500", height:"30px"}}>
+                                            <Grid container direction="row" spacing={1} alignItems="center">
+                                                <Grid item xs={2}>
+                                                    {item.keyword}
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                    {item.type || 'builtin'}
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                    {item.builtinValue}
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                    {item.defaultValue}
+                                                </Grid>
+                                                <Grid item xs={4}>
+                                                    <Tooltip title="Delete Parameter">
+                                                        <IconButton onClick={() => deleteParameter(item.keyword)}>
+                                                            <DeleteIcon color="primary" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    )))}
+                            </Grid>
+                        </TabPanel>
 
                     </div>
 
@@ -473,7 +660,30 @@ export default function EmailTemplateDialog(props) {
                                 style={{ color: "#000", fontWeight: "500" }}
                                 id="alert-dialog-description"
                             >
-                                Are you sure you want to delete this template?
+                                <Grid container spacing={4}>
+                                    <Grid item xs={12}>
+                                        Are you sure you want to delete this template?
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            autoFocus
+                                            name="templatenameuser"
+                                            id="templatenameuser"
+                                            label="Template Name"
+                                            placeholder="Please Retype The Template Name"
+                                            fullWidth
+                                            required
+                                            error={templatenameusererror}
+                                            helperText={`* Please retype the template name you want to be deleted.`}
+                                            value={templatenameuser}
+                                            onChange={(event) => {
+                                                settemplatenameuser(event.target.value)
+                                            }}
+                                            autoComplete="none"
+                                            variant="outlined"
+                                        />
+                                    </Grid>
+                                </Grid>
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
