@@ -3006,7 +3006,7 @@ export default function PatientDialog(props) {
                                                         {selectedTemplate.subject}
                                                         <div style={{position:"absolute", right:"5px", top:"-5px"}}>
                                                             {!emailSent && (
-                                                                <Button disabled={emailSending} onClick={sendEmail} startIcon={<SendIcon/>} variant="contained" color="primary">
+                                                                <Button disabled={emailSending || (!patient.email || patient.email.length < 3)} onClick={sendEmail} startIcon={<SendIcon/>} variant="contained" color="primary">
                                                                      Send Email
                                                                  </Button>
                                                             )}
