@@ -286,7 +286,8 @@ export default function EmailTemplatesTable(props) {
         );
       },
     },
-    { field: 'templateID', headerName: 'Template Name', width: 300 },
+    { field: 'templateID', headerName: 'Template Name', width: 200 },
+    { field: 'subject', headerName: 'Subject', width: 400 },
     { field: 'rawText', headerName: 'Email Body', width: 700 },
   ];
 

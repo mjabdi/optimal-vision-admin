@@ -19,6 +19,7 @@ import {
     makeStyles,
     MenuItem,
     Select,
+    Switch,
     TextField,
     Toolbar,
     Tooltip,
@@ -165,6 +166,8 @@ export default function EmailTemplateDialog(props) {
 
 
     const [templateIDError, settemplateIDError] = React.useState(false)
+    const [subjectError, setSubjectError] = React.useState(false)
+
     const [nameError, setNameError] = React.useState(false)
     const [surnameError, setSurnameError] = React.useState(false)
     const [birthDateError, setBirthDateError] = React.useState(false)
@@ -261,6 +264,7 @@ export default function EmailTemplateDialog(props) {
         settemplatenameusererror(false)
         setVariable({})
         setVariableErrors({})
+        setSubjectError(false)
     };
 
     const saveClicked = async () => {
@@ -367,7 +371,6 @@ export default function EmailTemplateDialog(props) {
 
         const _variable = {
             keyword: variable.keyword,
-            type: variable.type,
             builtinValue: variable.builtinValue,
             defaultValue: variable.defaultValue
         }
@@ -392,19 +395,11 @@ export default function EmailTemplateDialog(props) {
             }
         }
 
-        if (!variable.type) {
-            // setVariableErrors((prev) => prev = { ...prev, typeError: true })
-            // error = true
-            setVariable({...variable, type:"builtin"})
-        }
 
-        if ((variable.type === "builtin" || !variable.type) && !variable.builtinValue) {
+        if (!variable.builtinValue) {
             setVariableErrors((prev) => prev = { ...prev, builtinValueError: true })
             error = true
         }
-
-
-
 
 
         return !error
@@ -414,7 +409,6 @@ export default function EmailTemplateDialog(props) {
     {
         settemplate({...template, parameters: template.parameters.filter(e => e.keyword !== _keyword)})
     }
-
 
     return (
         <React.Fragment>
@@ -451,6 +445,7 @@ export default function EmailTemplateDialog(props) {
                         >
                             <Tab label="Email Text" {...a11yProps(0)} />
                             <Tab label={`Parameters`} {...a11yProps(1)} />
+                            <Tab label={`Settings`} {...a11yProps(2)} />
 
                         </Tabs>
                         <TabPanel value={value} index={0}>
@@ -489,6 +484,24 @@ export default function EmailTemplateDialog(props) {
 
                                 </Grid>
                                 <Grid item xs={12}>
+                                <TextField
+                                        name="subject"
+                                        id="subject"
+                                        label="Email Subject"
+                                        fullWidth
+                                        required
+                                        error={subjectError}
+                                        value={template.subject || ''}
+                                        onChange={(event) => {
+                                            settemplate({ ...template, subject: event.target.value })
+                                            setSubjectError(false)
+                                        }}
+                                        autoComplete="none"
+                                        variant="outlined"
+                                    />
+
+                                </Grid>
+                                <Grid item xs={12}>
                                     <Editor
                                         autoFocus
                                         editorState={editorState}
@@ -503,7 +516,7 @@ export default function EmailTemplateDialog(props) {
                             <Grid container direction="column" spacing={2}>
                                 <Grid item>
                                     <Grid container direction="row" spacing={1} alignItems="bottom">
-                                        <Grid item xs={2}>
+                                        <Grid item xs={3}>
                                             <TextField
                                                 name="keyword"
                                                 id="keyword"
@@ -518,29 +531,11 @@ export default function EmailTemplateDialog(props) {
                                                 onChange={(event) => setVariable({ ...variable, keyword: event.target.value })}
                                             />
                                         </Grid>
-                                        <Grid item xs={2}>
-                                            <FormControl
-                                                error={variableErrors.typeError}
-                                                fullWidth
-                                                required variant="outlined" className={classes.formControl}>
-                                                <InputLabel id="typeid">Type</InputLabel>
-                                                <Select
-                                                    labelId="typeid"
-                                                    id="type"
-                                                    value={variable.type || 'builtin'}
-                                                    onChange={(event) => setVariable({ ...variable, type: event.target.value })}
-                                                    label="Type"
-                                                >
-                                                    <MenuItem value={'builtin'}>Built-in Variable</MenuItem>
-                                                    <MenuItem value={'userinput'}>User Input Variable</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item xs={2}>
+                                        <Grid item xs={3}>
                                             <FormControl
                                                 error={variableErrors.builtinValueError}
-                                                disabled={variable.type && variable.type !== 'builtin'} fullWidth required variant="outlined" className={classes.formControl}>
-                                                <InputLabel id="builtinvalueid">Built-in Value</InputLabel>
+                                                fullWidth required variant="outlined" className={classes.formControl}>
+                                                <InputLabel id="builtinvalueid"> Value</InputLabel>
                                                 <Select
                                                     labelId="builtinvalueid"
                                                     id="builtinvalue"
@@ -548,16 +543,15 @@ export default function EmailTemplateDialog(props) {
                                                     onChange={(event) => setVariable({ ...variable, builtinValue: event.target.value })}
                                                     label="Built-in Value"
                                                 >
-                                                    <MenuItem value={'name'}>Patient Name</MenuItem>
-                                                    <MenuItem value={'surname'}>Patient Surname</MenuItem>
-                                                    <MenuItem value={'fullname'}>Patient Fullname</MenuItem>
-                                                    <MenuItem value={'birthdate'}>Patient BirthDate</MenuItem>
-                                                    <MenuItem value={'todaydate'}>Today Date</MenuItem>
-                                                    <MenuItem value={'todaydatetime'}>Today DateTime</MenuItem>
+                                                    <MenuItem value={'Patient Name'}>Patient Name</MenuItem>
+                                                    <MenuItem value={'Patient Surname'}>Patient Surname</MenuItem>
+                                                    <MenuItem value={'Patient Fullname'}>Patient Fullname</MenuItem>
+                                                    <MenuItem value={'Today Date'}>Today Date</MenuItem>
+                                                    <MenuItem value={'Appointment DateTime'}>Appointment DateTime</MenuItem>
                                                 </Select>
                                             </FormControl>
                                         </Grid>
-                                        <Grid item xs={2}>
+                                        <Grid item xs={3}>
                                             <TextField
                                                 name="defaultvalue"
                                                 id="defaultvalue"
@@ -571,7 +565,7 @@ export default function EmailTemplateDialog(props) {
 
                                             />
                                         </Grid>
-                                        <Grid item xs={4}>
+                                        <Grid item xs={3}>
                                             <Button onClick={addVariableCliced} startIcon={<AddIcon />} variant="contained" color="primary" fullWidth style={{ height: "55px" }}>
                                                 Add Variable
                                             </Button>
@@ -582,19 +576,16 @@ export default function EmailTemplateDialog(props) {
                                     <Grid item style={{marginTop:"20px", fontWeight:"500", height:"20px"}}>
                                          <Divider/>
                                          <Grid container direction="row" spacing={1} alignItems="center">
-                                                <Grid item xs={2}>
+                                                <Grid item xs={3}>
                                                     {"Keyword"}
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    {"Type"}
+                                                <Grid item xs={3}>
+                                                    {"Value"}
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    {"Built-in Value"}
-                                                </Grid>
-                                                <Grid item xs={2}>
+                                                <Grid item xs={3}>
                                                     {"Default Value"}
                                                 </Grid>
-                                                <Grid item xs={2}>
+                                                <Grid item xs={3}>
                                                 </Grid>
                                             </Grid>
                                             <Divider/>
@@ -602,7 +593,7 @@ export default function EmailTemplateDialog(props) {
 
                                     {(!template.parameters || template.parameters.length === 0) && (
                                         <Grid item>
-                                            <div style={{width:"100%", textAlign:"center", color:"#777", marginTop:"50px"}}>
+                                            <div style={{width:"80%", textAlign:"center", color:"#777", marginTop:"50px", fontSize:"1rem"}}>
                                                  No Parameters Defined
                                             </div>                                           
                                         </Grid>    
@@ -611,19 +602,16 @@ export default function EmailTemplateDialog(props) {
                                     {template.parameters && template.parameters.length > 0 && template.parameters.map((item => (
                                         <Grid item style={{marginTop:"10px", fontWeight:"500", height:"30px"}}>
                                             <Grid container direction="row" spacing={1} alignItems="center">
-                                                <Grid item xs={2}>
+                                                <Grid item xs={3}>
                                                     {item.keyword}
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    {item.type || 'builtin'}
-                                                </Grid>
-                                                <Grid item xs={2}>
+                                                <Grid item xs={3}>
                                                     {item.builtinValue}
                                                 </Grid>
-                                                <Grid item xs={2}>
+                                                <Grid item xs={3}>
                                                     {item.defaultValue}
                                                 </Grid>
-                                                <Grid item xs={4}>
+                                                <Grid item xs={3}>
                                                     <Tooltip title="Delete Parameter">
                                                         <IconButton onClick={() => deleteParameter(item.keyword)}>
                                                             <DeleteIcon color="primary" />
@@ -635,6 +623,33 @@ export default function EmailTemplateDialog(props) {
                                     )))}
                             </Grid>
                         </TabPanel>
+                        <TabPanel value={value} index={2}>
+                             <div style={{fontSize:"1.2rem", color:"#777", fontWeight:"500", marginBottom:"50px"}}>
+                                 Here you can set which emails (and when) should be sent to the patients automatically by the system :
+                             </div>   
+                             <Paper elevation={3}>
+                            <Grid container direction="column" spacing={2} style={{minHeight:"300px", padding:"10px 15px"}}>
+                                <Grid item>
+                                    <FormControlLabel
+                                        control={
+                                        <Switch
+                                            checked={template.sendWhenBookedCalendar}
+                                            onChange={(e) => {settemplate({...template,sendWhenBookedCalendar : e.target.checked})}}
+                                            name="check-whenbooked"
+                                            color="primary"
+                                        />
+                                        }
+                                          label={<span style={template.sendWhenBookedCalendar ? {fontWeight:"500",color:"#333" } : {color:"#777"}}>
+                                                Automatically Send This Email To Patients When an Appointment is Booked on the Calendar.
+                                                </span> 
+                                            }
+                                    />
+                                </Grid>
+                            </Grid>
+                            </Paper>
+
+                        </TabPanel>
+
 
                     </div>
 
