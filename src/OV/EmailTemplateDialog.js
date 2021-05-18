@@ -351,6 +351,11 @@ export default function EmailTemplateDialog(props) {
             setNameError(true)
         }
 
+        if (!template.subject || template.subject.length === 0) {
+            error = true
+            setSubjectError(true)
+        }
+
         return !error
     }
 
@@ -640,7 +645,7 @@ export default function EmailTemplateDialog(props) {
                                         />
                                         }
                                           label={<span style={template.sendWhenBookedCalendar ? {fontWeight:"500",color:"#333" } : {color:"#777"}}>
-                                                Automatically Send This Email To Patients When an Appointment is Booked on the Calendar.
+                                                Automatically send this email to the patients when an appointment is booked on the calendar.
                                                 </span> 
                                             }
                                     />

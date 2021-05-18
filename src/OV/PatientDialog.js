@@ -57,6 +57,16 @@ import PatientService from "./services/PatientService";
 import dateFormat from "dateformat";
 
 import SaveIcon from '@material-ui/icons/Save';
+import TemplateService from "./services/EmailTemplateService";
+
+import createDOMPurify from 'dompurify'
+import { JSDOM } from 'jsdom'
+
+import SendIcon from '@material-ui/icons/Send';
+import CheckIcon from '@material-ui/icons/Check';
+
+const window = (new JSDOM('')).window
+const DOMPurify = createDOMPurify(window)
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -149,6 +159,9 @@ export default function PatientDialog(props) {
     const [patient, setPatient] = React.useState({ formData: {} })
     const [saving, setSaving] = React.useState(false);
 
+    const [emailSent, setEmailSent] = React.useState(false)
+    const [emailSending, setEmailSending] = React.useState(false)
+
 
     const [patientIDError, setPatientIDError] = React.useState(false)
     const [nameError, setNameError] = React.useState(false)
@@ -165,6 +178,10 @@ export default function PatientDialog(props) {
 
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
 
+    const [selectedTemplateID, setSelectedTemplateID] = React.useState(null)
+    const [selectedTemplate, setSelectedTemplate] = React.useState(null)  
+    const [emailTemplates, setEmailTemplates] = React.useState([])
+
     const handleCloseDeleteDialog = () => {
         setOpenDeleteDialog(false)
     }
@@ -173,6 +190,20 @@ export default function PatientDialog(props) {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    const createPreview = async (_template) => {
+        try{
+            const res = await TemplateService.getEmailPreview(_template.templateID, null, patient.patientID)
+            if (res && res.data && res.data.result){
+                console.log(res.data.result)
+                setSelectedTemplate({..._template, html: res.data.result.content, subject: res.data.result.newSubject})
+            }
+
+        }catch(err)
+        {
+            console.error(err)
+        }
+    }
 
     useEffect(() => {
         if (props.open) {
@@ -193,11 +224,23 @@ export default function PatientDialog(props) {
             }
 
             setHistory(_history.reverse())
+            loadEmailTemplates()
 
         }
     }, [props.patient, props.open])
 
+    const loadEmailTemplates = async () => {
+        try{
+            const res = await TemplateService.getAllTemplates()
+            if (res){
+                setEmailTemplates(res.data)
+            }
 
+        }catch(err)
+        {
+            console.error(err)
+        }
+    }
 
     const handleClose = () => {
         props.handleClose();
@@ -207,6 +250,8 @@ export default function PatientDialog(props) {
         setNameError(false)
         setSurnameError(false)
         setPatientRepeated(false)
+        setSelectedTemplate(null) 
+        setSelectedTemplateID(null)
     };
 
     const saveClicked = async () => {
@@ -339,6 +384,36 @@ export default function PatientDialog(props) {
         )
     }
 
+    const handleSelectedTemplateChanged = (value) =>
+    {
+        setSelectedTemplateID(value)
+        const template = emailTemplates.find(e => e.templateID === value)
+        setSelectedTemplate(template)
+        createPreview(template) 
+        setEmailSent(false)
+    }
+
+    const sendEmail = async () => {
+        try{
+            setEmailSending(true)
+            setSaving(true)
+
+            await TemplateService.sendManualEmail(selectedTemplate.templateID, patient.email, null, patient.patientID)
+
+
+            setEmailSending(false)
+            setEmailSent(true)
+            setSaving(false)
+
+        }catch(err)
+        {
+            console.error(err)
+            setEmailSending(false)
+            setSaving(false)
+        }
+
+    }
+
 
     return (
         <React.Fragment>
@@ -394,6 +469,9 @@ export default function PatientDialog(props) {
                             <Tab label="Manifest Refraction" {...a11yProps(8)} />
                             <Tab label="Target Refraction" {...a11yProps(9)} /> */}
                             <Tab label="Recommendation" {...a11yProps(3)} />
+                            {props.patient && (
+                                <Tab label="Send Emails (Manually)" {...a11yProps(4)} />
+                            )}
                         </Tabs>
                         <TabPanel value={value} index={0}>
                             <Grid container spacing={4}>
@@ -2883,6 +2961,84 @@ export default function PatientDialog(props) {
                                 </Grid>
                             </Grid>
                         </TabPanel>
+                        
+                        {props.patient && (
+                            <TabPanel value={value} index={4}>
+                                <Grid container spacing={2} direction="column">
+                                    <Grid item>
+                                        <div style={{fontSize:"1.2rem", color:"#777", fontWeight:"500", marginBottom:"0px"}}>
+                                            Here you can manually send emails (from templates) to the patients:
+                                        </div>   
+                                    </Grid>
+                                    <Grid item style={{marginBottom:"10px"}}>
+                                      <Alert severity="info">Emails will be sent to "{patient.email}"</Alert>
+                                    </Grid>
+                                    <Grid item>
+                                    <FormControl fullWidth variant="outlined" className={classes.formControl}>
+                                        <InputLabel id="template-label-id">Choose Your Template</InputLabel>
+                                            <Select
+                                                fullWidth
+                                                label="Choose Your Template"
+                                                labelId="template-label-id"
+                                                id="template-label"
+                                                value={selectedTemplateID}
+                                                onChange={(event) => {
+                                                    handleSelectedTemplateChanged(event.target.value)
+                                                }}
+                                            >
+
+                                                {emailTemplates.map((item, index) => (
+                                                    <MenuItem value={item.templateID}>{`${item.templateID}`}</MenuItem>
+                                                ))
+                                                }
+
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item>
+                                        {selectedTemplate && (
+                                            <React.Fragment>
+                                                <div style={{fontWeight:"500", color:"#777", fontSize:"1rem", width:"100%", padding:"5px"}}>
+                                                    Email Preview :
+                                                </div>
+                                                <Paper elevation={4} style={{padding:"20px",marginBottom:"1px", backgroundColor:"#0083ba"}}>
+                                                    <div style={{fontSize:"1rem", fontWeight:"500", color:"#fff", position:"relative"}}>
+                                                        {selectedTemplate.subject}
+                                                        <div style={{position:"absolute", right:"5px", top:"-5px"}}>
+                                                            {!emailSent && (
+                                                                <Button disabled={emailSending} onClick={sendEmail} startIcon={<SendIcon/>} variant="contained" color="primary">
+                                                                     Send Email
+                                                                 </Button>
+                                                            )}
+                                                            {emailSent && (
+                                                                <div style={{fontWeight:"500", fontSize:"1rem", color:"#fff"}}>
+                                                                    <Grid container spacing={1} alignItems="center">
+                                                                        <Grid item>
+                                                                             Email Sent Successfully 
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            <CheckIcon/>
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                    
+                                                                 </div>
+                                                            )}
+                                                        </div>
+                                                    </div>   
+                                                </Paper>
+                                                <Paper elevation={4} style={{padding:"20px"}}>
+                                                    <div 
+                                                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedTemplate.html) }}
+                                                    >
+                                                    </div>
+                                                </Paper>
+                                            </React.Fragment>
+                                        )}
+                                    </Grid>
+
+                                </Grid>
+                             </TabPanel>                        
+                        )}
 
 
                     </div>

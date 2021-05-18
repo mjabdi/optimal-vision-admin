@@ -3,6 +3,15 @@ import axiosRetry from 'axios-retry';
 
 export default class TemplateService {
 
+   static getEmailPreview = (templateId, bookingId, patientId) =>
+   {
+      return API.post(`/api/optimalvision/emailtemplate/getemailpreview`, {templateId,bookingId,patientId});
+   }
+
+   static sendManualEmail = (templateId, sendTo, bookingId, patientId) =>
+   {
+      return API.post(`/api/optimalvision/emailtemplate/sendmanualemail`, {templateId,sendTo,bookingId,patientId});
+   }
 
    static registerNewTemplate = (payload) =>
    {
