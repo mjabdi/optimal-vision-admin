@@ -20,35 +20,6 @@ import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import SmsIcon from '@material-ui/icons/Sms';
 import DraftsIcon from '@material-ui/icons/Drafts';
 
-/// PCR ------------------
-import FindByRef from "./PCR/FindByRef";
-import BookingTable from "./PCR/BookingTable";
-import DashboardPreview from "./PCR/DashboardPreview";
-import UnmatchedRecords from "./PCR/UnmatchedRecords";
-// import CalendarView from "./PCR/calendar/CalendarView";
-import PCRCalendarView from "./PCR/calendar-admin/CalendarView";
-//-----------------------
-
-/// Gynae -------------------
-import GynaeBookingTable from "./Gynae/BookingTable";
-import GynaeDashboardPreview from "./Gynae/DashboardPreview";
-import GynaeFindByRef from "./Gynae/FindByRef";
-import GynaeCalendarView from "./Gynae/calendar-admin/CalendarView";
-//----------------------------
-
-/// GP -------------------
-import GPBookingTable from "./GP/BookingTable";
-import GPDashboardPreview from "./GP/DashboardPreview";
-import GPFindByRef from "./GP/FindByRef";
-import GPCalendarView from "./GP/calendar-admin/CalendarView";
-//----------------------------
-
-/// GP -------------------
-import STDBookingTable from "./STD/BookingTable";
-import STDDashboardPreview from "./STD/DashboardPreview";
-import STDFindByRef from "./STD/FindByRef";
-import STDCalendarView from "./STD/calendar-admin/CalendarView";
-//----------------------------
 
 // OV Admin ----------------
 import OVBookingTable from "./OV/BookingTable";

@@ -19,7 +19,6 @@ import { getMenuRole, getMenuId } from "./MenuList";
 import { border, borderBottom } from "@material-ui/system";
 import { getGlobalPath } from "./GlobalPath";
 
-import GyaneBookService from "./Gynae/services/BookService"
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -77,17 +76,6 @@ export default function MyMenu() {
 
   const updateShouldRefundsCount = async () =>
   {
-    try{
-      const res = await GyaneBookService.getShouldRefundsCount()
-      if (res && res.data && res.data.status === "OK")
-      {
-        setState(state => ({...state, shouldRefunsCount: res.data.count}))
-      }
-    }
-    catch(ex)
-    {
-      console.error(ex)
-    }
   }
 
   useEffect(() => {
@@ -140,9 +128,6 @@ export default function MyMenu() {
                         >{`${item.title}`}</span>{" "}
                       </Grid>
 
-                      {state.role === "gynae" && item.id === "deletedBookings" && state.shouldRefunsCount > 0 && (
-                        <span className={classes.Badge}> {state.shouldRefunsCount} </span>
-                      )}
 
                     </Grid>
                   </div>
