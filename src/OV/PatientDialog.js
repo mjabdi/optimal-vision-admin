@@ -2973,7 +2973,7 @@ export default function PatientDialog(props) {
                                     <Grid item style={{marginBottom:"10px"}}>
                                       <Alert severity="info">Emails will be sent to "{patient.email}"</Alert>
                                     </Grid>
-                                    <Grid item>
+                                    <Grid item xs={6}>
                                     <FormControl fullWidth variant="outlined" className={classes.formControl}>
                                         <InputLabel id="template-label-id">Choose Your Template</InputLabel>
                                             <Select
