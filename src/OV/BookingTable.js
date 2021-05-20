@@ -447,14 +447,15 @@ export default function BookingTable(props) {
       {
         field: "bookingTimeNormalized",
         headerName: "B Time",
-        width: 200,
-        valueGetter: (params) => {
-          return params.getValue("bookingTime");
+        width: 150,
+        renderCell: (params) => {
+          return <span style={{fontSize:"0.7rem",fontWeight:"500"}}>{params.getValue("bookingTime")}</span> ;
         },
       },
       { field: "fullname", headerName: "Fullname", width: 250 },
-      { field: "email", headerName: "Email", width: 200 },
       { field: "phone", headerName: "Telephone", width: 150 },
+
+      { field: "email", headerName: "Email", width: 200 },
       {
         field: "faceToFaceConsultation",
         headerName: "Consultation",
@@ -522,12 +523,17 @@ export default function BookingTable(props) {
               return FormatDateFromString(params.value);
           }
        },
-      { field: 'bookingTimeNormalized', headerName: 'B Time', width: 200 , valueGetter: (params) => {
-        return params.getValue('bookingTime');
-      }},
+       {
+        field: "bookingTimeNormalized",
+        headerName: "B Time",
+        width: 150,
+        renderCell: (params) => {
+          return <span style={{fontSize:"0.7rem",fontWeight:"500"}}>{params.getValue("bookingTime")}</span> ;
+        },
+      },
       { field: 'fullname', headerName: 'Fullname', width: 250 },
-      { field: 'email', headerName: 'Email', width: 200 },
       { field: 'phone', headerName: 'Telephone', width: 150 },
+      { field: 'email', headerName: 'Email', width: 200 },
       { field: 'faceToFaceConsultation', headerName: 'Consultation', width: 250 , renderCell: (params) => {
         return (
           <React.Fragment>

@@ -174,6 +174,7 @@ export default function EmailTemplateDialog(props) {
 
     const [templateRepeated, settemplateRepeated] = React.useState(false)
 
+    const [clinicError, setClinicError] = React.useState(false)
 
     const [value, setValue] = React.useState(0);
 
@@ -214,12 +215,12 @@ export default function EmailTemplateDialog(props) {
 
             if (props.template) {
                 let parameters = []
-                try{
+                try {
                     parameters = JSON.parse(props.template.parameters)
                 }
-                catch(err){}
+                catch (err) { }
 
-                settemplate({ ...props.template, parameters: parameters})
+                settemplate({ ...props.template, parameters: parameters })
                 const html = props.template.html
                 const contentBlock = htmlToDraft(html);
                 if (contentBlock) {
@@ -265,12 +266,12 @@ export default function EmailTemplateDialog(props) {
         setVariable({})
         setVariableErrors({})
         setSubjectError(false)
+        setClinicError(false)
     };
 
     const saveClicked = async () => {
 
         if (!validatetemplate()) {
-            setValue(0)
             return
         }
 
@@ -279,14 +280,14 @@ export default function EmailTemplateDialog(props) {
             setSaving(true)
             const parameters = JSON.stringify(template.parameters)
             if (props.template) {
-                const res = await templateService.updateTemplate({ id: template._id, template: {...template, parameters: parameters} })
+                const res = await templateService.updateTemplate({ id: template._id, template: { ...template, parameters: parameters } })
                 setSaving(false)
                 if (res.data.status === "OK") {
                     setState(state => ({ ...state, templateDialogDataChanged: !state.templateDialogDataChanged }))
                     handleClose();
                 }
             } else {
-                const res = await templateService.registerNewTemplate({ template: {...template, parameters: parameters}  })
+                const res = await templateService.registerNewTemplate({ template: { ...template, parameters: parameters } })
                 setSaving(false)
                 if (res.data.status === "OK") {
                     setState(state => ({ ...state, templateDialogDataChanged: !state.templateDialogDataChanged }))
@@ -339,11 +340,15 @@ export default function EmailTemplateDialog(props) {
         if (!template.templateID || template.templateID.trim().length === 0) {
             error = true
             settemplateIDError(true)
+            setValue(0)
+
         }
 
         if (!template.html || template.html.length === 0) {
             error = true
             setNameError(true)
+            setValue(0)
+
         }
 
         if (!template.rawText || template.rawText.length === 0) {
@@ -354,6 +359,14 @@ export default function EmailTemplateDialog(props) {
         if (!template.subject || template.subject.length === 0) {
             error = true
             setSubjectError(true)
+            setValue(0)
+
+        }
+
+        if (template.sendWhenBookedCalendar && !template.clinic) {
+            error = true
+            setClinicError(true)
+            setValue(2)
         }
 
         return !error
@@ -391,10 +404,8 @@ export default function EmailTemplateDialog(props) {
             error = true
         }
 
-        if (variable.keyword)
-        {
-            if (template.parameters.find(e => e.keyword === variable.keyword))
-            {
+        if (variable.keyword) {
+            if (template.parameters.find(e => e.keyword === variable.keyword)) {
                 setVariableErrors((prev) => prev = { ...prev, keywordError: true })
                 error = true
             }
@@ -410,9 +421,8 @@ export default function EmailTemplateDialog(props) {
         return !error
     }
 
-    const deleteParameter = (_keyword) =>
-    {
-        settemplate({...template, parameters: template.parameters.filter(e => e.keyword !== _keyword)})
+    const deleteParameter = (_keyword) => {
+        settemplate({ ...template, parameters: template.parameters.filter(e => e.keyword !== _keyword) })
     }
 
     return (
@@ -489,7 +499,7 @@ export default function EmailTemplateDialog(props) {
 
                                 </Grid>
                                 <Grid item xs={12}>
-                                <TextField
+                                    <TextField
                                         name="subject"
                                         id="subject"
                                         label="Email Subject"
@@ -576,81 +586,122 @@ export default function EmailTemplateDialog(props) {
                                             </Button>
                                         </Grid>
                                     </Grid>
+                                </Grid>
+
+                                <Grid item style={{ marginTop: "20px", fontWeight: "500", height: "20px" }}>
+                                    <Divider />
+                                    <Grid container direction="row" spacing={1} alignItems="center">
+                                        <Grid item xs={3}>
+                                            {"Keyword"}
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            {"Value"}
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            {"Default Value"}
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                        </Grid>
                                     </Grid>
+                                    <Divider />
+                                </Grid>
 
-                                    <Grid item style={{marginTop:"20px", fontWeight:"500", height:"20px"}}>
-                                         <Divider/>
-                                         <Grid container direction="row" spacing={1} alignItems="center">
-                                                <Grid item xs={3}>
-                                                    {"Keyword"}
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    {"Value"}
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    {"Default Value"}
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                </Grid>
+                                {(!template.parameters || template.parameters.length === 0) && (
+                                    <Grid item>
+                                        <div style={{ width: "80%", textAlign: "center", color: "#777", marginTop: "50px", fontSize: "1rem" }}>
+                                            No Parameters Defined
+                                            </div>
+                                    </Grid>
+                                )}
+
+                                {template.parameters && template.parameters.length > 0 && template.parameters.map((item => (
+                                    <Grid item style={{ marginTop: "10px", fontWeight: "500", height: "30px" }}>
+                                        <Grid container direction="row" spacing={1} alignItems="center">
+                                            <Grid item xs={3}>
+                                                {item.keyword}
                                             </Grid>
-                                            <Divider/>
-                                      </Grid>      
-
-                                    {(!template.parameters || template.parameters.length === 0) && (
-                                        <Grid item>
-                                            <div style={{width:"80%", textAlign:"center", color:"#777", marginTop:"50px", fontSize:"1rem"}}>
-                                                 No Parameters Defined
-                                            </div>                                           
-                                        </Grid>    
-                                    )}
-
-                                    {template.parameters && template.parameters.length > 0 && template.parameters.map((item => (
-                                        <Grid item style={{marginTop:"10px", fontWeight:"500", height:"30px"}}>
-                                            <Grid container direction="row" spacing={1} alignItems="center">
-                                                <Grid item xs={3}>
-                                                    {item.keyword}
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    {item.builtinValue}
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    {item.defaultValue}
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <Tooltip title="Delete Parameter">
-                                                        <IconButton onClick={() => deleteParameter(item.keyword)}>
-                                                            <DeleteIcon color="primary" />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </Grid>
+                                            <Grid item xs={3}>
+                                                {item.builtinValue}
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                {item.defaultValue}
+                                            </Grid>
+                                            <Grid item xs={3}>
+                                                <Tooltip title="Delete Parameter">
+                                                    <IconButton onClick={() => deleteParameter(item.keyword)}>
+                                                        <DeleteIcon color="primary" />
+                                                    </IconButton>
+                                                </Tooltip>
                                             </Grid>
                                         </Grid>
-                                    )))}
+                                    </Grid>
+                                )))}
                             </Grid>
                         </TabPanel>
                         <TabPanel value={value} index={2}>
-                             <div style={{fontSize:"1.2rem", color:"#777", fontWeight:"500", marginBottom:"50px"}}>
-                                 Here you can set which emails (and when) should be sent to the patients automatically by the system :
-                             </div>   
-                             <Paper elevation={3}>
-                            <Grid container direction="column" spacing={2} style={{minHeight:"300px", padding:"10px 15px"}}>
-                                <Grid item>
-                                    <FormControlLabel
-                                        control={
-                                        <Switch
-                                            checked={template.sendWhenBookedCalendar}
-                                            onChange={(e) => {settemplate({...template,sendWhenBookedCalendar : e.target.checked})}}
-                                            name="check-whenbooked"
-                                            color="primary"
-                                        />
-                                        }
-                                          label={<span style={template.sendWhenBookedCalendar ? {fontWeight:"500",color:"#333" } : {color:"#777"}}>
-                                                Automatically send this email to the patients when an appointment is booked on the calendar.
-                                                </span> 
+                            <div style={{ fontSize: "1.2rem", color: "#777", fontWeight: "500", marginBottom: "50px" }}>
+                                Here you can set which emails (and when) should be sent to the patients automatically by the system :
+                             </div>
+                            <Paper elevation={3}>
+                                <Grid container direction="column" spacing={2} style={{ minHeight: "300px", padding: "10px 15px" }}>
+                                    <Grid item>
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={template.sendWhenBookedCalendar}
+                                                    onChange={(e) => { settemplate({ ...template, sendWhenBookedCalendar: e.target.checked }) }}
+                                                    name="check-whenbooked"
+                                                    color="primary"
+                                                />
                                             }
-                                    />
+                                            label={<span style={template.sendWhenBookedCalendar ? { fontWeight: "500", color: "#333" } : { color: "#777" }}>
+                                                Automatically send this email to the patients when an appointment is booked on the calendar.
+                                                </span>
+                                            }
+                                        />
+                                    </Grid>
+                                    {template.sendWhenBookedCalendar && (
+                                        <React.Fragment>
+                                            <Grid item xs={12}>
+                                                <Grid container alignItems="center" spacing={2}>
+                                                    <Grid item>
+                                                        <div style={{ fontSize: "1rem", color: "#777", fontWeight: "500" }}>
+                                                            Please choose the <strong>clinic</strong> you want this email would be sent for:
+                                                         </div>
+
+                                                    </Grid>
+                                                    <Grid item xs={12} md={4}>
+                                                        <FormControl
+                                                            error={clinicError}
+                                                            fullWidth required variant="outlined" className={classes.formControl}>
+                                                            <InputLabel id="clinic">Select Clinic</InputLabel>
+                                                            <Select
+                                                                labelId="clinic"
+                                                                id="clinic-id"
+                                                                value={template.clinic || null}
+                                                                onChange={(event) => {
+                                                                    settemplate({...template, clinic: event.target.value})
+                                                                    setClinicError(false)
+                                                                }}
+                                                                label="Select Clinic"
+                                                            >
+                                                                <MenuItem value={'All Clinics'}>All Clinics</MenuItem>
+                                                                <MenuItem value={'Virtual Consultation'}>Virtual Consultation</MenuItem>
+                                                                <MenuItem value={'F2F Clinic'}>F2F Clinic</MenuItem>
+                                                                <MenuItem value={'Laser Theatre'}>Laser Theatre</MenuItem>
+                                                                <MenuItem value={'Lens Theatre'}>Lens Theatre</MenuItem>
+                                                                <MenuItem value={'Post Op'}>Post Op</MenuItem>
+                                                                <MenuItem value={'Optometry'}>Optometry</MenuItem>
+
+                                                            </Select>
+                                                        </FormControl>
+
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </React.Fragment>
+                                    )}
                                 </Grid>
-                            </Grid>
                             </Paper>
 
                         </TabPanel>

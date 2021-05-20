@@ -31,6 +31,8 @@ import Paper from "@material-ui/core/Paper";
 
 import DeleteIcon from "@material-ui/icons/Delete";
 import BookService from "./services/BookService";
+import SearchIcon from '@material-ui/icons/Search';
+
 
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -53,6 +55,8 @@ import InvoiceDialog from "../InvoiceDialog";
 import InvoiceService from "../services/InvoiceService";
 import CallIcon from '@material-ui/icons/Call';
 import Alert from "@material-ui/lab/Alert";
+import PatientDialog from "./PatientDialog";
+import PatientService from "./services/PatientService";
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -400,6 +404,12 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
   },
 
+  SearchIcon:{
+    fontSize: "2rem",
+    color: theme.palette.primary.main,
+}
+
+
 
 
 }));
@@ -436,6 +446,14 @@ export default function BookingDialog(props) {
   const [openInvoiceDialog, setOpenInvoiceDialog] = React.useState(false);
 
   const [selectedBooking, setSelectedBooking] = React.useState(null);
+
+  const [selectedPatient, setSelectedPatient] = React.useState(null)
+  const [patientDialogOpen, setPatientDialogOpen] = React.useState(false)
+
+  const handleClosePatientDialog = () => {
+    setPatientDialogOpen(false)
+  }
+
 
   const [editMode, setEditMode] = React.useState({ edit: false, person: null });
   const [deleteMode, setDeleteMode] = React.useState({
@@ -491,7 +509,8 @@ export default function BookingDialog(props) {
 
   useEffect(() => {
     if (props.open && props.booking) {
-      setNotes(props.booking.notes || '')
+      // setNotes(props.booking.notes || '')
+      loadPatient()
     }
   }, [props.open, props.booking]);
 
@@ -531,6 +550,58 @@ export default function BookingDialog(props) {
     setNotes(event.target.value);
     setFieldChanged(!fieldChanged);
   };
+
+
+  const loadPatient = async () =>
+  {
+    try{
+      if (props.booking.patientID)
+      {
+        setSaving(true)
+        const res = await PatientService.getPatientByPatientId(props.booking.patientID)
+        setSelectedPatient(res.data)
+        setSaving(false)
+        setBooking(props.booking)
+      }else{
+        setSaving(true)
+
+        const res0 = await PatientService.getPatientByEmail(props.booking.email)
+        if (res0 && res0.data)
+        {
+          await bookingService.updateBooking({bookingId: props.booking._id, patientID: res0.data.patientID})
+          setState(state => ({...state, bookingDialogDataChanged : !state.bookingDialogDataChanged}))
+          setSelectedPatient(res0.data)
+          setBooking({...props.booking, patientID : res0.data.patientID})
+          setSaving(false)
+
+        }else{
+          const res1 = await PatientService.getNewPatientID()
+          const fullnameArray = props.booking.fullname.split(" ")
+          const patient = { 
+            name: fullnameArray.length > 0 ? fullnameArray[0] : '-',
+            surname: fullnameArray.length > 1 ? fullnameArray[1] : '-',
+            mobileTel: props.booking.phone,
+            email: props.booking.email,
+            patientID: res1.data.result,
+            formData: JSON.stringify({})
+          }
+  
+          const res2 = await PatientService.registerNewPatient({patient: patient})
+          await bookingService.updateBooking({bookingId: props.booking._id, patientID: res1.data.result})
+          setState(state => ({...state, bookingDialogDataChanged : !state.bookingDialogDataChanged}))
+          setSelectedPatient(res2.data.patient)
+          setBooking({...props.booking, patientID : res1.data.result})
+          setSaving(false)
+        }
+      }
+
+    }catch(err)
+    {
+      console.log(err)
+      setSaving(false)
+      setSelectedPatient(null)
+    }
+  } 
 
   const getStatusLabel = (status) => {
     if (status === "booked") {
@@ -816,30 +887,30 @@ export default function BookingDialog(props) {
     setOpenInvoiceDialog(true);
   };
 
-  useEffect(() => {
-    if (props.booking) {
-      BookService.getBookingById(props.booking._id)
-        .then((res) => {
-          setBooking(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+  // useEffect(() => {
+  //   if (props.booking) {
+  //     BookService.getBookingById(props.booking._id)
+  //       .then((res) => {
+  //         setBooking(res.data);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
 
-      setState((state) => ({
-        ...state,
-        bookingDialogDataChanged: !state.bookingDialogDataChanged
-          ? true
-          : false,
-      }));
-    }
-  }, [refreshData, state.bookingPayChanged]);
+  //     setState((state) => ({
+  //       ...state,
+  //       bookingDialogDataChanged: !state.bookingDialogDataChanged
+  //         ? true
+  //         : false,
+  //     }));
+  //   }
+  // }, [refreshData, state.bookingPayChanged]);
 
-  useEffect(() => {
-    if (props.booking) {
-      setBooking(props.booking);
-    }
-  }, [props.booking]);
+  // useEffect(() => {
+  //   if (props.booking) {
+  //     setBooking(props.booking);
+  //   }
+  // }, [props.booking]);
 
   const undoPaymentClicked = async () => {
     setSaving(true);
@@ -945,6 +1016,8 @@ export default function BookingDialog(props) {
     setInvoice(null);
     setSaving(false)
     setNotesSaved(false)
+    setPatientDialogOpen(false)
+    setSelectedPatient(null)
     props.onClose();
   };
 
@@ -986,7 +1059,7 @@ export default function BookingDialog(props) {
       {booking && (
         <React.Fragment>
           <Dialog
-            maxWidth="md"
+            maxWidth="sm"
             open={props.open}
             TransitionComponent={Transition}
             keepMounted
@@ -1078,6 +1151,38 @@ export default function BookingDialog(props) {
                 <Grid item xs={12} key={`panel0`}>
                   <div className={classes.infoDetails}>
                     <ul className={classes.ul}>
+                    <li className={classes.li}>
+                        <Grid container spacing={2} alignItems="center">
+                          <Grid item>
+                            <span className={classes.infoTitle}>
+                              Patient ID :
+                            </span>
+
+                            <span
+                              hidden={
+                                editMode.edit &&
+                                editMode.person._id === booking._id
+                              }
+                              className={classes.infoData}
+                            >
+                              {booking.patientID}
+                            </span>
+                          </Grid>
+                          <Grid item>
+                            {selectedPatient && (
+                              <Tooltip title="Show Patient Detail">
+                                <IconButton onClick={() => { setPatientDialogOpen(true) }}>
+                                  <SearchIcon className={classes.SearchIcon} />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+
+                          </Grid>
+                        </Grid>
+                      </li>
+
+                      <Divider />
+
                       <li className={classes.li} style={{ marginTop: "20px" }}>
                         <Grid container spacing={2}>
                           <Grid item xs={12} md={6}>
@@ -1327,7 +1432,7 @@ export default function BookingDialog(props) {
 
                       <Divider />
 
-                      <li className={classes.li} style={{ marginTop: "20px" }}>
+                      {/* <li className={classes.li} style={{ marginTop: "20px" }}>
                         <Grid container spacing={2}>
                           <Grid item xs={12}>
                             <TextField
@@ -1344,7 +1449,7 @@ export default function BookingDialog(props) {
                                     setNotes(event.target.value)
                                 }}
                             />
-
+ 
                           </Grid>
                           {notesSaved && (
                             <Grid item xs={12}>
@@ -1358,9 +1463,9 @@ export default function BookingDialog(props) {
                           </Grid>
 
                         </Grid>
-                      </li>
+                          </li> */}
 
-                      <Divider />
+                      {/* <Divider /> */}
 
                       {booking.questions && (
                         <React.Fragment>
@@ -1817,7 +1922,20 @@ export default function BookingDialog(props) {
               </Button>
             </DialogActions>
 
+
+
           </Dialog>
+
+          {selectedPatient && (
+                <PatientDialog
+                    patient={selectedPatient}
+                    open={patientDialogOpen}
+                    handleClose={handleClosePatientDialog}
+                    title={`${selectedPatient.name?.toUpperCase()} ${selectedPatient.surname?.toUpperCase()}`}
+                    saveButtonText={"Save Changes"}
+                />
+            )}
+
 
         </React.Fragment>
       )}

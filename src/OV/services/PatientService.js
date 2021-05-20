@@ -3,6 +3,10 @@ import axiosRetry from 'axios-retry';
 
 export default class PatientService {
 
+   static getNewPatientID = () =>
+   {
+      return API.get(`/api/optimalvision/patient/getnewpatientid`);
+   }
 
    static registerNewPatient = (payload) =>
    {
@@ -33,6 +37,12 @@ export default class PatientService {
     {
        return API.get(`/api/optimalvision/patient/getpatientbypatientid?patientID=${patientID}`);
     }
+
+    static getPatientByEmail = (email) =>
+    {
+       return API.get(`/api/optimalvision/patient/getpatientbyemail?email=${email}`);
+    }
+
 
     static getAllPatients = () =>
     {

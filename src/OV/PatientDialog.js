@@ -247,6 +247,7 @@ export default function PatientDialog(props) {
                 }
             }
             else {
+                getNewPatientID()
                 setPatient({ formData: {},  name : props.name || '', surname: props.surname || ''})
             }
 
@@ -256,6 +257,19 @@ export default function PatientDialog(props) {
 
         }
     }, [props.patient, props.open])
+
+    const getNewPatientID = async () =>
+    {
+        setSaving(true)
+        const res = await PatientService.getNewPatientID()
+        setSaving(false)
+        if (res && res.data && res.data.result)
+        {
+            setPatient({...patient, patientID: res.data.result})
+            setPatientIDError(false)
+            setPatientRepeated(false)
+        }
+    }
 
     const loadEmailTemplates = async () => {
         try{
@@ -330,6 +344,9 @@ export default function PatientDialog(props) {
                     setPatientIDError(true)
                     setPatientRepeated(true)
                     setValue(0)
+                    setTimeout(() => {
+                        getNewPatientID()
+                    }, 1000);
 
                 }
             }
@@ -361,8 +378,6 @@ export default function PatientDialog(props) {
             setSaving(false)
         }
     }
-
-
 
     const validatePatient = () => {
         var error = false

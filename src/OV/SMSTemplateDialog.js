@@ -187,6 +187,7 @@ export default function SMSTemplateDialog(props) {
 
     const [templateRepeated, settemplateRepeated] = React.useState(false)
 
+    const [clinicError, setClinicError] = React.useState(false)
 
     const [value, setValue] = React.useState(0);
 
@@ -256,12 +257,12 @@ export default function SMSTemplateDialog(props) {
         setVariableErrors({})
         setSubjectError(false)
         setRawTextError(false)
+        setClinicError(false)
     };
 
     const saveClicked = async () => {
 
         if (!validatetemplate()) {
-            setValue(0)
             return
         }
 
@@ -330,12 +331,21 @@ export default function SMSTemplateDialog(props) {
         if (!template.templateID || template.templateID.trim().length === 0) {
             error = true
             settemplateIDError(true)
+            setValue(0)
         }
 
         if (!template.rawText || template.rawText.length === 0) {
             error = true
             setRawTextError(true)
+            setValue(0)
         }
+
+        if (template.sendWhenBookedCalendar && !template.clinic) {
+            error = true
+            setClinicError(true)
+            setValue(2)
+        }
+
 
         return !error
     }
@@ -429,7 +439,7 @@ export default function SMSTemplateDialog(props) {
                             textColor="secondary"
                             className={classes.tabs}
                         >
-                            <Tab label="Email Text" {...a11yProps(0)} />
+                            <Tab label="SMS Text" {...a11yProps(0)} />
                             <Tab label={`Parameters`} {...a11yProps(1)} />
                             <Tab label={`Settings`} {...a11yProps(2)} />
 
@@ -625,6 +635,48 @@ export default function SMSTemplateDialog(props) {
                                             }
                                     />
                                 </Grid>
+                                {template.sendWhenBookedCalendar && (
+                                        <React.Fragment>
+                                            <Grid item xs={12}>
+                                                <Grid container alignItems="center" spacing={2}>
+                                                    <Grid item>
+                                                        <div style={{ fontSize: "1rem", color: "#777", fontWeight: "500" }}>
+                                                            Please choose the <strong>clinic</strong> you want this email would be sent for:
+                                                         </div>
+
+                                                    </Grid>
+                                                    <Grid item xs={12} md={4}>
+                                                        <FormControl
+                                                            error={clinicError}
+                                                            fullWidth required variant="outlined" className={classes.formControl}>
+                                                            <InputLabel id="clinic">Select Clinic</InputLabel>
+                                                            <Select
+                                                                labelId="clinic"
+                                                                id="clinic-id"
+                                                                value={template.clinic || null}
+                                                                onChange={(event) => {
+                                                                    settemplate({...template, clinic: event.target.value})
+                                                                    setClinicError(false)
+                                                                }}
+                                                                label="Select Clinic"
+                                                            >
+                                                                <MenuItem value={'All Clinics'}>All Clinics</MenuItem>
+                                                                <MenuItem value={'Virtual Consultation'}>Virtual Consultation</MenuItem>
+                                                                <MenuItem value={'F2F Clinic'}>F2F Clinic</MenuItem>
+                                                                <MenuItem value={'Laser Theatre'}>Laser Theatre</MenuItem>
+                                                                <MenuItem value={'Lens Theatre'}>Lens Theatre</MenuItem>
+                                                                <MenuItem value={'Post Op'}>Post Op</MenuItem>
+                                                                <MenuItem value={'Optometry'}>Optometry</MenuItem>
+
+                                                            </Select>
+                                                        </FormControl>
+
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </React.Fragment>
+                                    )}
+
                             </Grid>
                             </Paper>
 
