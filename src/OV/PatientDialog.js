@@ -58,6 +58,7 @@ import dateFormat from "dateformat";
 
 import SaveIcon from '@material-ui/icons/Save';
 import TemplateService from "./services/EmailTemplateService";
+import SMSTemplateService from "./services/SMSTemplateService";
 
 // import createDOMPurify from 'dompurify'
 // import { JSDOM } from 'jsdom'
@@ -143,6 +144,11 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.main,
         fontWeight: "500",
         paddingTop: "15px"
+    },
+
+    multilineColor:{
+        color:'#333',
+        lineHeight: "1.5rem"
     }
 
 }));
@@ -161,6 +167,9 @@ export default function PatientDialog(props) {
 
     const [emailSent, setEmailSent] = React.useState(false)
     const [emailSending, setEmailSending] = React.useState(false)
+
+    const [smsSent, setSMSSent] = React.useState(false)
+    const [smsSending, setSMSSending] = React.useState(false)
 
 
     const [patientIDError, setPatientIDError] = React.useState(false)
@@ -182,6 +191,11 @@ export default function PatientDialog(props) {
     const [selectedTemplate, setSelectedTemplate] = React.useState(null)  
     const [emailTemplates, setEmailTemplates] = React.useState([])
 
+    const [selectedSMSTemplateID, setSelectedSMSTemplateID] = React.useState(null)
+    const [selectedSMSTemplate, setSelectedSMSTemplate] = React.useState(null)  
+    const [smsTemplates, setSMSTemplates] = React.useState([])
+
+
     const handleCloseDeleteDialog = () => {
         setOpenDeleteDialog(false)
     }
@@ -195,7 +209,6 @@ export default function PatientDialog(props) {
         try{
             const res = await TemplateService.getEmailPreview(_template.templateID, null, patient.patientID)
             if (res && res.data && res.data.result){
-                console.log(res.data.result)
                 setSelectedTemplate({..._template, html: res.data.result.content, subject: res.data.result.newSubject})
             }
 
@@ -204,6 +217,20 @@ export default function PatientDialog(props) {
             console.error(err)
         }
     }
+
+    const createSMSPreview = async (_template) => {
+        try{
+            const res = await SMSTemplateService.getSMSPreview(_template.templateID, null, patient.patientID)
+            if (res && res.data && res.data.result){
+                setSelectedSMSTemplate({..._template, rawText: res.data.result.content})
+            }
+
+        }catch(err)
+        {
+            console.error(err)
+        }
+    }
+
 
     useEffect(() => {
         if (props.open) {
@@ -225,6 +252,7 @@ export default function PatientDialog(props) {
 
             setHistory(_history.reverse())
             loadEmailTemplates()
+            loadSMSTemplates()
 
         }
     }, [props.patient, props.open])
@@ -242,6 +270,20 @@ export default function PatientDialog(props) {
         }
     }
 
+    const loadSMSTemplates = async () => {
+        try{
+            const res = await SMSTemplateService.getAllTemplates()
+            if (res){
+                setSMSTemplates(res.data)
+            }
+
+        }catch(err)
+        {
+            console.error(err)
+        }
+    }
+
+
     const handleClose = () => {
         props.handleClose();
         setValue(0)
@@ -252,6 +294,12 @@ export default function PatientDialog(props) {
         setPatientRepeated(false)
         setSelectedTemplate(null) 
         setSelectedTemplateID(null)
+        setSelectedSMSTemplate(null)
+        setSelectedSMSTemplateID(null)
+        setSMSSent(false)
+        setEmailSent(false)
+        setSMSSending(false)
+        setEmailSending(false)
     };
 
     const saveClicked = async () => {
@@ -393,6 +441,16 @@ export default function PatientDialog(props) {
         setEmailSent(false)
     }
 
+    const handleSelectedSMSTemplateChanged = (value) =>
+    {
+        setSelectedSMSTemplateID(value)
+        const template = smsTemplates.find(e => e.templateID === value)
+        setSelectedSMSTemplate(template)
+        createSMSPreview(template) 
+        setSMSSent(false)
+    }
+
+
     const sendEmail = async () => {
         try{
             setEmailSending(true)
@@ -413,6 +471,27 @@ export default function PatientDialog(props) {
         }
 
     }
+
+    const sendSMS = async () => {
+        try{
+            setSMSSending(true)
+            setSaving(true)
+
+            await SMSTemplateService.sendManualSMS(selectedSMSTemplate.templateID, patient.mobileTel, null, patient.patientID)
+
+            setSMSSending(false)
+            setSMSSent(true)
+            setSaving(false)
+
+        }catch(err)
+        {
+            console.error(err)
+            setSMSSending(false)
+            setSaving(false)
+        }
+
+    }
+
 
 
     return (
@@ -459,19 +538,14 @@ export default function PatientDialog(props) {
                             <Tab label="Personal Details" {...a11yProps(0)} />
                             <Tab label={`History & Symptoms`} {...a11yProps(1)} />
                             <Tab label={`Notes From Consultation`} {...a11yProps(2)} />
-
-                            {/* <Tab label="Dry Eyes" {...a11yProps(2)} />
-                            <Tab label="Ocular Examination" {...a11yProps(3)} />
-                            <Tab label="Diagnostics" {...a11yProps(4)} />
-                            <Tab label="Uncorrected VA" {...a11yProps(5)} />
-                            <Tab label="Refraction" {...a11yProps(6)} />
-                            <Tab label="Auto Refraction" {...a11yProps(7)} />
-                            <Tab label="Manifest Refraction" {...a11yProps(8)} />
-                            <Tab label="Target Refraction" {...a11yProps(9)} /> */}
                             <Tab label="Recommendation" {...a11yProps(3)} />
                             {props.patient && (
                                 <Tab label="Send Emails (Manually)" {...a11yProps(4)} />
                             )}
+                            {props.patient && (
+                                <Tab label="Send SMS (Manually)" {...a11yProps(5)} />
+                            )}
+
                         </Tabs>
                         <TabPanel value={value} index={0}>
                             <Grid container spacing={4}>
@@ -989,7 +1063,7 @@ export default function PatientDialog(props) {
                                         </div>   
                                     </Grid>
                                     <Grid item style={{marginBottom:"10px"}}>
-                                      <Alert severity="info">Emails will be sent to "{patient.email}"</Alert>
+                                      <Alert severity="info">Emails will be sent to  <span style={{fontWeight:"500"}}>"{patient.email}"</span></Alert>
                                     </Grid>
                                     <Grid item xs={6}>
                                     <FormControl fullWidth variant="outlined" className={classes.formControl}>
@@ -1021,7 +1095,7 @@ export default function PatientDialog(props) {
                                                 </div>
                                                 <Paper elevation={4} style={{padding:"20px",marginBottom:"1px", backgroundColor:"#0083ba"}}>
                                                     <div style={{fontSize:"1rem", fontWeight:"500", color:"#fff", position:"relative"}}>
-                                                        {selectedTemplate.subject}
+                                                         To: {patient.email}
                                                         <div style={{position:"absolute", right:"5px", top:"-5px"}}>
                                                             {!emailSent && (
                                                                 <Button disabled={emailSending || (!patient.email || patient.email.length < 3)} onClick={sendEmail} startIcon={<SendIcon/>} variant="contained" color="primary">
@@ -1044,6 +1118,12 @@ export default function PatientDialog(props) {
                                                         </div>
                                                     </div>   
                                                 </Paper>
+                                                <Paper elevation={4} style={{padding:"10px",marginBottom:"1px", backgroundColor:"#e6f8ff"}}>
+                                                    <div style={{fontSize:"1rem", fontWeight:"500", color:"#006b94", position:"relative"}}>
+                                                         <span>Subject:</span> {selectedTemplate.subject}
+                                                    </div>
+                                                 </Paper>        
+
                                                 <Paper elevation={4} style={{padding:"20px"}}>
                                                     <div 
                                                         // dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedTemplate.html) }}
@@ -1058,6 +1138,99 @@ export default function PatientDialog(props) {
                                 </Grid>
                              </TabPanel>                        
                         )}
+
+                        {props.patient && (
+                            <TabPanel value={value} index={5}>
+                                <Grid container spacing={2} direction="column">
+                                    <Grid item>
+                                        <div style={{fontSize:"1.2rem", color:"#777", fontWeight:"500", marginBottom:"0px"}}>
+                                            Here you can manually send sms (from templates) to the patients:
+                                        </div>   
+                                    </Grid>
+                                    <Grid item style={{marginBottom:"10px"}}>
+                                      <Alert severity="info">SMS will be sent to <span style={{fontWeight:"500"}}>"{patient.mobileTel}"</span></Alert>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                    <FormControl fullWidth variant="outlined" className={classes.formControl}>
+                                        <InputLabel id="template-label-id">Choose Your Template</InputLabel>
+                                            <Select
+                                                fullWidth
+                                                label="Choose Your Template"
+                                                labelId="template-label-id"
+                                                id="template-label"
+                                                value={selectedSMSTemplateID}
+                                                onChange={(event) => {
+                                                    handleSelectedSMSTemplateChanged(event.target.value)
+                                                }}
+                                            >
+
+                                                {smsTemplates.map((item, index) => (
+                                                    <MenuItem value={item.templateID}>{`${item.templateID}`}</MenuItem>
+                                                ))
+                                                }
+
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item>
+                                        {selectedSMSTemplate && (
+                                            <React.Fragment>
+                                                <div style={{fontWeight:"500", color:"#777", fontSize:"1rem", width:"100%", padding:"5px"}}>
+                                                    SMS Preview :
+                                                </div>
+                                                <Paper elevation={4} style={{padding:"20px",marginBottom:"1px", backgroundColor:"#0083ba"}}>
+                                                    <div style={{fontSize:"1rem", fontWeight:"500", color:"#fff", position:"relative"}}>
+                                                        To:  {patient.mobileTel}
+                                                        <div style={{position:"absolute", right:"5px", top:"-5px"}}>
+                                                            {!smsSent && (
+                                                                <Button disabled={smsSending || (!patient.mobileTel || patient.mobileTel.length < 3)} onClick={sendSMS} startIcon={<SendIcon/>} variant="contained" color="primary">
+                                                                     Send SMS
+                                                                 </Button>
+                                                            )}
+                                                            {smsSent && (
+                                                                <div style={{fontWeight:"500", fontSize:"1rem", color:"#fff"}}>
+                                                                    <Grid container spacing={1} alignItems="center">
+                                                                        <Grid item>
+                                                                             SMS Sent Successfully 
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            <CheckIcon/>
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                    
+                                                                 </div>
+                                                            )}
+                                                        </div>
+                                                    </div>   
+                                                </Paper>
+                                                <Paper elevation={4} style={{padding:"20px"}}>
+                                                    <div> 
+                                                        <TextField
+                                                            name="smspreview"
+                                                            id="smspreview"
+                                                            disabled={true}
+                                                            fullWidth
+                                                            multiline={true}
+                                                            rows={20}
+                                                            value= {selectedSMSTemplate.rawText}
+                                                            InputProps={{
+                                                                classes: {
+                                                                    input: classes.multilineColor
+                                                                }
+                                                            }}
+                                                        />
+
+                                                       
+                                                    </div>
+                                                </Paper>
+                                            </React.Fragment>
+                                        )}
+                                    </Grid>
+
+                                </Grid>
+                             </TabPanel>                        
+                        )}
+
 
 
                     </div>

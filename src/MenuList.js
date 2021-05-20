@@ -26,6 +26,7 @@ import OVBookingTable from "./OV/BookingTable";
 import OVCalendarView from "./OV/calendar-admin/CalendarView";
 import PatientsTable from "./OV/PatientsTable";
 import EmailTemplstesTable from "./OV/EmailTemplatesTable"
+import SMSTemplatesTable from "./OV/SMSTemplatesTable";
 
 //---------------
 
@@ -398,7 +399,9 @@ export const getMenuContent = (role, index) => {
         return <PatientsTable />;  
       case 10:
           return <EmailTemplstesTable />
-  
+      case 11:
+          return <SMSTemplatesTable />
+    
       default:
         return `Page Not Found!`;
     }
