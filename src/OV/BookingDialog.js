@@ -52,6 +52,7 @@ import { CalendarColors } from "../Admin/calendar-admin/colors";
 import InvoiceDialog from "../InvoiceDialog";
 import InvoiceService from "../services/InvoiceService";
 import CallIcon from '@material-ui/icons/Call';
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -457,6 +458,8 @@ export default function BookingDialog(props) {
 
 
   const [saving, setSaving] = React.useState(false);
+  const [notesSaved, setNotesSaved] = React.useState(false);
+
   const [deleting, setDeleting] = React.useState(false);
   const [restoring, setRestoring] = React.useState(false);
 
@@ -487,13 +490,10 @@ export default function BookingDialog(props) {
   const [invoiceLoaded, setInvoiceLoaded] = React.useState(false);
 
   useEffect(() => {
-    if (!props.open) {
-      setTimeout(() => {
-        setEditMode({ edit: false, person: null });
-        setRecordChanged(false);
-      }, 500);
+    if (props.open && props.booking) {
+      setNotes(props.booking.notes || '')
     }
-  }, [props.open]);
+  }, [props.open, props.booking]);
 
   const bookingDateChanged = (event) => {
     setBookingDate(event.target.value);
@@ -943,6 +943,8 @@ export default function BookingDialog(props) {
     setEmailSent(false);
     setEmailSentInvoice(false);
     setInvoice(null);
+    setSaving(false)
+    setNotesSaved(false)
     props.onClose();
   };
 
@@ -962,12 +964,29 @@ export default function BookingDialog(props) {
     return result
   }
 
+  const saveNotes = async () =>
+  {
+    try{
+      setSaving(true)
+      setNotesSaved(false)
+      await BookService.updateBooking({bookingId: props.booking._id, notes: notes})
+      setState(state => ({...state, bookingDialogDataChanged : !state.bookingDialogDataChanged}))
+      setNotesSaved(true)
+      setSaving(false)
+
+    }catch(err)
+    {
+      console.log(err)
+      setSaving(false)
+    }
+  }
+
   return (
     <React.Fragment>
       {booking && (
         <React.Fragment>
           <Dialog
-            maxWidth="xs"
+            maxWidth="md"
             open={props.open}
             TransitionComponent={Transition}
             keepMounted
@@ -1056,12 +1075,12 @@ export default function BookingDialog(props) {
                   paddingTop: "0px",
                 }}
               >
-                <Grid item xs={12} md={12} key={`panel0`}>
+                <Grid item xs={12} key={`panel0`}>
                   <div className={classes.infoDetails}>
                     <ul className={classes.ul}>
                       <li className={classes.li} style={{ marginTop: "20px" }}>
                         <Grid container spacing={2}>
-                          <Grid item xs={12}>
+                          <Grid item xs={12} md={6}>
                             <span className={classes.infoTitle}>
                               BOOKED DATE :
                             </span>
@@ -1098,7 +1117,7 @@ export default function BookingDialog(props) {
                               ></TextField>
                             </span>
                           </Grid>
-                          <Grid item xs={12}>
+                          <Grid item xs={12} md={6}>
                             <span className={classes.infoTitle}>
                               BOOKED TIME :
                             </span>
@@ -1176,7 +1195,7 @@ export default function BookingDialog(props) {
                               ></TextField>
                             </span>
                           </Grid>
-                          <Grid item xs={12}>
+                          <Grid item xs={12} md={6}>
                             <span className={classes.infoTitle}>EMAIL : </span>
                             <span
                               hidden={
@@ -1209,7 +1228,7 @@ export default function BookingDialog(props) {
                               ></TextField>
                             </span>
                           </Grid>
-                          <Grid item xs={12}>
+                          <Grid item xs={12} md={6}>
                             <span className={classes.infoTitle}>TEL : </span>
                             <span
                               hidden={
@@ -1303,6 +1322,41 @@ export default function BookingDialog(props) {
                               ></TextField>
                             </span>
                           </Grid>
+                        </Grid>
+                      </li>
+
+                      <Divider />
+
+                      <li className={classes.li} style={{ marginTop: "20px" }}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12}>
+                            <TextField
+                                name="notesfromconsultation"
+                                id="notesfromconsultation"
+                                label="Notes From Consultation"
+                                fullWidth
+                                multiline
+                                rows={5}
+                                variant="outlined"
+                                autoComplete="none"
+                                value={notes || ''}
+                                onChange={(event) => {
+                                    setNotes(event.target.value)
+                                }}
+                            />
+
+                          </Grid>
+                          {notesSaved && (
+                            <Grid item xs={12}>
+                              <Alert severity="success">Notes Saved Successfully!</Alert>
+                            </Grid>                          
+                          )}
+                          <Grid item xs={12}>
+                            <Button onClick={saveNotes} fullWidth variant="contained" color="secondary">
+                                Save Notes
+                            </Button>
+                          </Grid>
+
                         </Grid>
                       </li>
 
