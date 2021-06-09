@@ -647,8 +647,8 @@ export default function BookingTable(props) {
   }
 
   useEffect( () => {
-            setTopCount(25)
-            loadData(25)
+            setTopCount(10000)
+            loadData(10000)
         },
         [props.date]);
 
