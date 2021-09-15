@@ -1079,6 +1079,13 @@ export default function BookingDialog(props) {
                  </div>
               )}
 
+              {booking.referrer && booking.referrer.length > 0 && (
+                 <div style={{position:"absolute", left:"10px", top:"12px", backgroundColor:"#00a6bf", fontSize:"0.85rem", padding:"8px", borderRadius:"10px"}}>
+                   {booking.referrer.toUpperCase()} 
+                 </div>
+              )}
+
+
 
               <Grid
                 container
